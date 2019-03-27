@@ -19,5 +19,5 @@ add_library(gltf SHARED buffer.cpp)
 add_executable(dino main.cpp shader.cpp buffer.cpp)
 target_link_libraries(dino gltf ${SDL2_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${JSONCPP_LIBRARIES})
 
-add_executable(tests test_main.cpp test_buffer.cpp)
+add_executable(tests test_main.cpp test_gltf.cpp)
 target_link_libraries(tests gltf ${SDL2_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${JSONCPP_LIBRARIES})

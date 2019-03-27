@@ -37,6 +37,8 @@ namespace gltf
     std::shared_ptr<BufferView> _bufferView;
     size_t _count;
   };
+  
+  std::vector<std::shared_ptr<Accessor> > loadAccessors(const Json::Value & doc);
 }
 
 #endif
