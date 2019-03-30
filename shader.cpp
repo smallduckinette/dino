@@ -40,6 +40,11 @@ void Shader::use()
   glUseProgram(_programId);
 }
 
+void Shader::setMatrix(const std::string & name, const glm::mat4 & mat)
+{
+  glUniformMatrix4fv(glGetUniformLocation(_programId, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
+
 void Shader::compile(GLuint id, std::istream & str) const
 {
   auto source = std::string(std::istreambuf_iterator<char>(str),

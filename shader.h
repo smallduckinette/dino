@@ -4,6 +4,8 @@
 #include <istream>
 
 #include <GL/glew.h>
+#include <glm/glm.hpp>
+
 
 class Shader
 {
@@ -14,6 +16,8 @@ public:
   ~Shader();
   
   void use();
+
+  void setMatrix(const std::string & name, const glm::mat4 & mat);
   
 private:
   void compile(GLuint id, std::istream & str) const;

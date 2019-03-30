@@ -8,6 +8,7 @@
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "shader.h"
 #include "parser.h"
@@ -19,12 +20,15 @@ int main()
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
       throw std::runtime_error(std::string("Failed to init SDL : ") + SDL_GetError());
 
+    const int SCR_WIDTH = 512;
+    const int SCR_HEIGHT = 512;
+    
     std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)>
       window(SDL_CreateWindow("Dino",
                               SDL_WINDOWPOS_UNDEFINED,
                               SDL_WINDOWPOS_UNDEFINED,
-                              512,
-                              512,
+                              SCR_WIDTH,
+                              SCR_HEIGHT,
                               SDL_WINDOW_OPENGL),
              SDL_DestroyWindow);
     
@@ -64,6 +68,17 @@ int main()
       glClear(GL_COLOR_BUFFER_BIT);
       
       shader.use();
+
+      glm::mat4 model(1.0f);
+      glm::mat4 view(1.0f);
+      glm::mat4 projection(1.0f);
+      model = glm::rotate(model, SDL_GetTicks() / 1000.0f, glm::vec3(0.5f, 1.0f, 0.0f));
+      view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
+      projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+      
+      shader.setMatrix("model", model);
+      shader.setMatrix("view", view);
+      shader.setMatrix("projection", projection);
       
       for(auto && mesh : meshes)
       {
