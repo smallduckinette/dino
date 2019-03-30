@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 
 #include "shader.h"
+#include "parser.h"
 
 int main()
 {
@@ -31,9 +32,12 @@ int main()
     glewExperimental = GL_TRUE;
     glewInit();
 
+    std::ifstream str("cube.gltf");
+    gltf::parse(str);
+    
     const GLubyte* renderer = glGetString(GL_RENDERER); // get renderer string
     const GLubyte* version = glGetString(GL_VERSION); // version as a string
-
+    
     std::cout << "Renderer: " << renderer << std::endl;
     std::cout << "Version: " << version << std::endl;
     

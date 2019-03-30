@@ -21,6 +21,16 @@ gltf::Buffer::Buffer(const Json::Value & doc)
     throw std::runtime_error("Inconsistent buffer size");
 }
 
+const char * gltf::Buffer::getData() const
+{
+  return _data.data();
+}
+
+size_t gltf::Buffer::getSize() const
+{
+  return _data.size();
+}
+
 gltf::BufferView::BufferView(const Json::Value & doc,
                              const std::vector<std::shared_ptr<Buffer> > & buffers)
 {
@@ -33,6 +43,16 @@ gltf::BufferView::BufferView(const Json::Value & doc,
   _offset = doc.get("byteOffset", 0).asUInt();
 }
 
+const char * gltf::BufferView::getData() const
+{
+  return _buffer->getData() + _offset;
+}
+
+size_t gltf::BufferView::getSize() const
+{
+  return _length;
+}
+
 gltf::Accessor::Accessor(const Json::Value & doc,
                          const std::vector<std::shared_ptr<BufferView> > & bufferViews)
 {
@@ -40,7 +60,100 @@ gltf::Accessor::Accessor(const Json::Value & doc,
   if(viewIndex >= bufferViews.size())
     throw std::runtime_error("Accessor buffer view reference out of bounds");
   _bufferView = bufferViews.at(viewIndex);
+  
+  switch(doc.get("componentType", 0).asUInt())
+  {
+  case 5120:
+    _componentType = GL_BYTE;
+    break;
+  case 5121:
+    _componentType = GL_UNSIGNED_BYTE;
+    break;
+  case 5122:
+    _componentType = GL_SHORT;
+    break;
+  case 5123:
+    _componentType = GL_UNSIGNED_SHORT;
+    break;
+  case 5125:
+    _componentType = GL_UNSIGNED_INT;
+    break;
+  case 5126:
+    _componentType = GL_FLOAT;
+    break;
+  default:
+    throw std::runtime_error("Unknown component type " + doc.get("componentType", 0).asString());
+  }
+  
   _count = doc.get("count", 0).asUInt();
+}
+
+
+const char * gltf::Accessor::getData() const
+{
+  return _bufferView->getData();
+}
+
+size_t gltf::Accessor::getCount() const
+{
+  return _count;
+}
+
+GLenum gltf::Accessor::getComponentType() const
+{
+  return _componentType;
+}
+
+size_t gltf::Accessor::getComponentSize() const
+{
+  switch(_componentType)
+  {
+  case GL_BYTE:
+  case GL_UNSIGNED_BYTE:
+    return 1;
+  case GL_SHORT:
+  case GL_UNSIGNED_SHORT:
+    return 2;
+  case GL_UNSIGNED_INT:
+  case GL_FLOAT:
+    return 4;
+  default:
+    throw std::runtime_error("Invalid component type" + std::to_string(_componentType));
+  }
+}
+
+size_t gltf::Accessor::getSize() const
+{
+  return getCount() * getComponentSize();
+}
+
+std::ostream & gltf::operator<<(std::ostream & str, const Accessor & accessor)
+{
+  switch(accessor.getComponentType())
+  {
+  case GL_BYTE:
+    accessor.print<char>(str);
+    break;
+  case GL_UNSIGNED_BYTE:
+    accessor.print<unsigned char>(str);
+    break;    
+  case GL_SHORT:
+    accessor.print<short int>(str);
+    break;    
+  case GL_UNSIGNED_SHORT:
+    accessor.print<unsigned short int>(str);
+    break;        
+  case GL_UNSIGNED_INT:
+    accessor.print<unsigned int>(str);
+    break;        
+  case GL_FLOAT:
+    accessor.print<float>(str);
+    break;        
+  default:
+    throw std::runtime_error("Invalid component type" + std::to_string(accessor.getComponentType()));
+  }  
+  
+  return str;
 }
 
 std::vector<std::shared_ptr<gltf::Accessor> > gltf::loadAccessors(const Json::Value & doc)

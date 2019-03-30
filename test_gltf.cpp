@@ -4,6 +4,7 @@
 #include <json/json.h>
 
 #include "buffer.h"
+#include "parser.h"
 
 BOOST_AUTO_TEST_SUITE(Gltf)
 
