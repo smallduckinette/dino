@@ -44,6 +44,7 @@ namespace gltf
     size_t getCount() const;
     GLenum getComponentType() const;
     size_t getComponentSize() const;
+    size_t getTypeSize() const;
     size_t getSize() const;
     
     template<typename TYPE>
@@ -63,6 +64,7 @@ namespace gltf
     std::shared_ptr<BufferView> _bufferView;
     GLenum _componentType;
     size_t _count;
+    size_t _typeSize;
   };
 
   std::ostream & operator<<(std::ostream & str, const Accessor & accessor);

@@ -85,6 +85,16 @@ gltf::Accessor::Accessor(const Json::Value & doc,
     throw std::runtime_error("Unknown component type " + doc.get("componentType", 0).asString());
   }
   
+  std::string type = doc.get("type", "").asString();
+  if(type == "SCALAR")
+    _typeSize = 1;
+  else if(type == "VEC2")
+    _typeSize = 2;
+  else if(type == "VEC3")
+    _typeSize = 3;
+  else
+    throw std::runtime_error("Unknown type " + type);
+  
   _count = doc.get("count", 0).asUInt();
 }
 
@@ -122,9 +132,14 @@ size_t gltf::Accessor::getComponentSize() const
   }
 }
 
+size_t gltf::Accessor::getTypeSize() const
+{
+  return _typeSize;
+}
+
 size_t gltf::Accessor::getSize() const
 {
-  return getCount() * getComponentSize();
+  return getCount() * getComponentSize() * getTypeSize();
 }
 
 std::ostream & gltf::operator<<(std::ostream & str, const Accessor & accessor)

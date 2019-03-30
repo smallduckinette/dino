@@ -20,6 +20,8 @@ namespace gltf
     Primitive(const Primitive & other) = delete;
     Primitive & operator=(const Primitive & other) = delete;
     
+    void draw() const;
+    
   private:
     void cleanup();
 
@@ -28,6 +30,9 @@ namespace gltf
     GLuint _vertexArray;
     GLuint _vertexBuffer;
     GLuint _elements;
+    
+    GLsizei _count;
+    GLenum _type;
   };
   
   class Mesh
@@ -35,6 +40,8 @@ namespace gltf
   public:
     Mesh(const Json::Value & doc,
          const std::vector<std::shared_ptr<Accessor> > & accessors);
+    
+    void draw() const;
     
   private:
     std::string _name;
@@ -62,5 +69,5 @@ namespace gltf
     std::vector<std::shared_ptr<Node> > _nodes;
   };
   
-  std::vector<std::shared_ptr<Scene> > parse(std::istream & str);
+  std::vector<std::shared_ptr<Mesh> > parse(std::istream & str);
 }

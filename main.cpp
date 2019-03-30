@@ -31,51 +31,19 @@ int main()
 
     glewExperimental = GL_TRUE;
     glewInit();
-
-    std::ifstream str("cube.gltf");
-    gltf::parse(str);
-    
+        
     const GLubyte* renderer = glGetString(GL_RENDERER); // get renderer string
     const GLubyte* version = glGetString(GL_VERSION); // version as a string
     
     std::cout << "Renderer: " << renderer << std::endl;
     std::cout << "Version: " << version << std::endl;
     
+    std::ifstream str("cube.gltf");
+    auto meshes = gltf::parse(str);
+    
     std::ifstream vertex("shader.vert");
     std::ifstream fragment("shader.frag");
     Shader shader(vertex, fragment);
-    
-    float vertices[] = {
-      0.5f,  0.5f, 0.0f,
-      0.5f, -0.5f, 0.0f,
-      -0.5f, -0.5f, 0.0f,
-      -0.5f,  0.5f, 0.0f
-    };
-    
-    unsigned int indices[] = {
-      0, 1, 3,
-      1, 2, 3
-    };    
-    
-    GLuint VBO, VAO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-    
-    glBindVertexArray(VAO);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-    
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    
-    glBindVertexArray(0);
     
     bool running = true;
     while(running)
@@ -89,13 +57,15 @@ int main()
         }
       }
       
-      glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+      glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT);
-
+      
       shader.use();
       
-      glBindVertexArray(VAO);
-      glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+      for(auto && mesh : meshes)
+      {
+        mesh->draw();
+      }
       
       SDL_GL_SwapWindow(window.get());
     }
