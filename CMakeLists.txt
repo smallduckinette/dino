@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS "-DBOOST_LOG_DYN_LINK -O0 -ggdb -std=c++17 -W -Wall -Werror 
 find_package(SDL2 REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
-find_package(Boost REQUIRED COMPONENTS log)
+find_package(Boost REQUIRED COMPONENTS log program_options)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(JSONCPP jsoncpp)
 

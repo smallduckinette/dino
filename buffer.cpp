@@ -1,6 +1,8 @@
 #include "buffer.h"
 
 #include <stdexcept>
+#include <fstream>
+#include <iterator>
 
 #include "base64.h"
 #include <boost/algorithm/string/predicate.hpp>
@@ -9,13 +11,20 @@
 gltf::Buffer::Buffer(const Json::Value & doc)
 {
   size_t length = doc.get("byteLength", 0).asUInt();
-  std::string b64data = doc.get("uri", "").asString();
+  std::string uri = doc.get("uri", "").asString();
   
-  std::string header("data:application/octet-stream;base64,");
-  if(!boost::algorithm::starts_with(b64data, header))
-    throw std::runtime_error("Unrecognized doc format");
-  
-  _data = base64_decode(b64data.begin() + header.size(), b64data.end());
+  std::string inlineHeader("data:application/octet-stream;base64,");
+  if(boost::algorithm::starts_with(uri, inlineHeader))
+  {
+    _data = base64_decode(uri.begin() + inlineHeader.size(), uri.end());
+  }
+  else
+  {
+    std::ifstream file(uri);
+    std::copy(std::istreambuf_iterator<char>(file),
+              std::istreambuf_iterator<char>(),
+              std::back_inserter(_data));
+  }
   
   if(_data.size() != length)
     throw std::runtime_error("Inconsistent buffer size");
