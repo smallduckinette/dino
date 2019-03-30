@@ -22,7 +22,6 @@ gltf::Primitive::Primitive(const Json::Value & doc,
     glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
     
     BOOST_LOG_TRIVIAL(debug) << "Loading buffers...";
-    
     std::vector<std::shared_ptr<Accessor> > selectedAccessors;
     selectedAccessors.push_back(accessors.at(doc["attributes"].get("POSITION", "").asUInt()));
     selectedAccessors.push_back(accessors.at(doc["attributes"].get("NORMAL", "").asUInt()));
@@ -71,7 +70,7 @@ gltf::Primitive::Primitive(const Json::Value & doc,
                   std::back_inserter(data));
       }
     }
-
+    
     BOOST_LOG_TRIVIAL(debug) << "Copying " << data.size() << " bytes of data out of expected " << totalSize;
     glBufferData(GL_ARRAY_BUFFER, data.size(), &data[0], GL_STATIC_DRAW);
     
@@ -86,13 +85,14 @@ gltf::Primitive::Primitive(const Json::Value & doc,
                                << GL_FALSE << ", "
                                << totalStride << ", "
                                << offset << ")";
-      
-      glVertexAttribPointer(index++,
+      glVertexAttribPointer(index,
                             accessor->getTypeSize(),
                             accessor->getComponentType(),
                             GL_FALSE,
                             totalStride,
                             (void *)(offset));
+      glEnableVertexAttribArray(index);
+      ++index;
       offset += accessor->getTypeSize() * accessor->getComponentSize();
     }
     
@@ -109,9 +109,9 @@ gltf::Primitive::Primitive(const Json::Value & doc,
                  GL_STATIC_DRAW);
     
     // Cleanup
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    //glBindBuffer(GL_ARRAY_BUFFER, 0);
-    //glBindVertexArray(0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
   }
   catch(const std::exception &)
   {

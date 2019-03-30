@@ -1,6 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
+#include <chrono>
+
+#include <boost/log/trivial.hpp>
 
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
