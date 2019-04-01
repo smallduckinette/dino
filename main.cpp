@@ -26,6 +26,7 @@ int main(int argc, char ** argv)
     desc.add_options()
       ("help", "Displays help")
       ("verbose,v", "Verbose logging")
+      ("vsync", "enable vsync")
       ("model,m", po::value<std::string>(), "Model to load");
 
     po::variables_map vm;
@@ -41,7 +42,7 @@ int main(int argc, char ** argv)
     if(!vm.count("model"))
       throw std::runtime_error("No model selected");
     std::string model = vm["model"].as<std::string>();
-    
+
     if(vm.count("verbose"))
     {
       boost::log::core::get()->set_filter
@@ -75,13 +76,19 @@ int main(int argc, char ** argv)
     std::unique_ptr<void, decltype(&SDL_GL_DeleteContext)>
       glContext(SDL_GL_CreateContext(window.get()),
                 SDL_GL_DeleteContext);
-        
+
+    if(vm.count("vsync"))
+    {
+      SDL_GL_SetSwapInterval(1);
+    }
+    
     glewExperimental = GL_TRUE;
     glewInit();
     
     glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
     
     glEnable(GL_MULTISAMPLE);
+    glEnable(GL_DEPTH_TEST); 
     
     const GLubyte* renderer = glGetString(GL_RENDERER); // get renderer string
     const GLubyte* version = glGetString(GL_VERSION); // version as a string
@@ -96,6 +103,8 @@ int main(int argc, char ** argv)
     std::ifstream fragment("shader.frag");
     Shader shader(vertex, fragment);
     
+    auto t1 = std::chrono::system_clock::now();
+    
     bool running = true;
     while(running)
     {
@@ -109,17 +118,18 @@ int main(int argc, char ** argv)
       }
       
       glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
-      glClear(GL_COLOR_BUFFER_BIT);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       
       shader.use();
 
       glm::mat4 model(1.0f);
       glm::mat4 view(1.0f);
       glm::mat4 projection(1.0f);
-      model = glm::rotate(model, SDL_GetTicks() / 10000.0f, glm::vec3(0.5f, 1.0f, 0.0f));
+      model = glm::rotate(model, SDL_GetTicks() / 1000.0f, glm::vec3(0.5f, 1.0f, 0.0f));
       view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
       projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
       
+      shader.setInteger("diffuse", 0);
       shader.setMatrix("model", model);
       shader.setMatrix("view", view);
       shader.setMatrix("projection", projection);
@@ -130,6 +140,11 @@ int main(int argc, char ** argv)
       }
       
       SDL_GL_SwapWindow(window.get());
+
+      auto t2 = std::chrono::system_clock::now();
+      std::chrono::duration<double> d = (t2 - t1);
+      std::cout << 1 / d.count() << std::endl;
+      t1 = t2;
     }
   }
   catch(const std::exception & e)

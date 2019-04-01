@@ -2,12 +2,72 @@
 
 #include <numeric>
 #include <boost/log/trivial.hpp>
+#include <SDL2/SDL_image.h>
 
 #include "buffer.h"
 
 
+gltf::Image::Image(const Json::Value & doc)
+{
+  BOOST_LOG_TRIVIAL(debug) << "Loading image ";
+  
+  try
+  {
+    glGenTextures(1, &_textureId);
+    glBindTexture(GL_TEXTURE_2D, _textureId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)>
+      imageData(IMG_Load(doc.get("uri", "").asString().c_str()),
+                SDL_FreeSurface);
+    
+    GLenum mode = (imageData->format->BytesPerPixel == 4) ? GL_RGBA : GL_RGB;
+    
+    BOOST_LOG_TRIVIAL(debug) << "Image size is " << imageData->w << " x " << imageData->h;
+    BOOST_LOG_TRIVIAL(debug) << "Mode is " << (int)imageData->format->BytesPerPixel;
+    
+    glTexImage2D(GL_TEXTURE_2D,
+                 0,
+                 mode,
+                 imageData->w,
+                 imageData->h,
+                 0,
+                 GL_RGBA,
+                 GL_UNSIGNED_BYTE,
+                 imageData->pixels);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    
+    //glBindTexture(GL_TEXTURE_2D, 0);
+  }
+  catch(const std::exception &)
+  {
+    cleanup();
+    throw;
+  }
+}
+
+gltf::Image::~Image()
+{
+  cleanup();
+}
+
+void gltf::Image::bind()
+{
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, _textureId);
+}
+
+void gltf::Image::cleanup()
+{
+  glDeleteTextures(1, &_textureId);
+}
+
 gltf::Primitive::Primitive(const Json::Value & doc,
-                           const std::vector<std::shared_ptr<Accessor> > & accessors):
+                           const std::vector<std::shared_ptr<Accessor> > & accessors,
+                           const std::vector<std::shared_ptr<Image> > & images):
   _name(doc.get("name", "").asString())
 {
   BOOST_LOG_TRIVIAL(debug) << "Loading primitive " << _name;
@@ -108,6 +168,9 @@ gltf::Primitive::Primitive(const Json::Value & doc,
                  indicesAccessor->getData(),
                  GL_STATIC_DRAW);
     
+    // Load material
+    _image = images.at(0);
+    
     // Cleanup
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -128,6 +191,7 @@ gltf::Primitive::~Primitive()
 
 void gltf::Primitive::draw() const
 {
+  _image->bind();
   glBindVertexArray(_vertexArray);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _elements);
   glDrawElements(GL_TRIANGLES, _count, _type, 0);
@@ -143,11 +207,12 @@ void gltf::Primitive::cleanup()
 }
 
 gltf::Mesh::Mesh(const Json::Value & doc,
-                 const std::vector<std::shared_ptr<Accessor> > & accessors)
+                 const std::vector<std::shared_ptr<Accessor> > & accessors,
+                 const std::vector<std::shared_ptr<Image> > & images)
 {
   for(auto && primitive : doc["primitives"])
   {
-    _primitives.push_back(std::make_shared<Primitive>(primitive, accessors));
+    _primitives.push_back(std::make_shared<Primitive>(primitive, accessors, images));
   }
 }
 
@@ -165,11 +230,17 @@ std::vector<std::shared_ptr<gltf::Mesh> > gltf::parse(std::istream & str)
   str >> doc;
 
   auto accessors = gltf::loadAccessors(doc);
-  
+
+  std::vector<std::shared_ptr<Image> > images;
+  for(auto && image : doc["images"])
+  {
+    images.push_back(std::make_shared<Image>(image));
+  }
+
   std::vector<std::shared_ptr<Mesh> > meshes;
   for(auto && mesh : doc["meshes"])
   {
-    meshes.push_back(std::make_shared<Mesh>(mesh, accessors));
+    meshes.push_back(std::make_shared<Mesh>(mesh, accessors, images));
   }
   
   return meshes;

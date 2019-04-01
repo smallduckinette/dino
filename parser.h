@@ -9,12 +9,28 @@ namespace gltf
 {
   class Accessor;
 
+  class Image
+  {
+  public:
+    Image(const Json::Value & doc);
+    
+    ~Image();
+    
+    void bind();
+    
+  private:
+    void cleanup();
+    
+    GLuint _textureId;
+  };
+  
   class Primitive
   {
   public:
     Primitive(const Json::Value & doc,
-              const std::vector<std::shared_ptr<Accessor> > & accessors);
-        
+              const std::vector<std::shared_ptr<Accessor> > & accessors,
+              const std::vector<std::shared_ptr<Image> > & images);
+    
     ~Primitive();
     
     Primitive(const Primitive & other) = delete;
@@ -33,13 +49,16 @@ namespace gltf
     
     GLsizei _count;
     GLenum _type;
+    
+    std::shared_ptr<Image> _image;
   };
   
   class Mesh
   {
   public:
     Mesh(const Json::Value & doc,
-         const std::vector<std::shared_ptr<Accessor> > & accessors);
+         const std::vector<std::shared_ptr<Accessor> > & accessors,
+         const std::vector<std::shared_ptr<Image> > & images);
     
     void draw() const;
     

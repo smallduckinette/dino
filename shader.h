@@ -18,6 +18,7 @@ public:
   void use();
 
   void setMatrix(const std::string & name, const glm::mat4 & mat);
+  void setInteger(const std::string & name, int value);
   
 private:
   void compile(GLuint id, std::istream & str) const;
