@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.7)
 
 project(dino)
 
+enable_testing()
 set(CMAKE_CXX_FLAGS "-DBOOST_LOG_DYN_LINK -O0 -ggdb -std=c++17 -W -Wall -Werror -pedantic")
 
 find_package(SDL2 REQUIRED)
@@ -15,10 +16,13 @@ pkg_check_modules(SDL2IMAGE SDL2_image)
 
 include_directories(${SDL2_INCLUDE_DIRS} ${SDL2IMAGE_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
-add_library(gltf SHARED buffer.cpp parser.cpp)
+add_subdirectory(adh)
+add_subdirectory(gltf)
 
 add_executable(dino main.cpp shader.cpp)
-target_link_libraries(dino gltf ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${JSONCPP_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(dino adh gltf ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${JSONCPP_LIBRARIES} ${Boost_LIBRARIES})
 
-add_executable(tests test_main.cpp test_gltf.cpp)
-target_link_libraries(tests gltf ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${JSONCPP_LIBRARIES} ${Boost_LIBRARIES})
+# add_executable(tests test_main.cpp test_gltf.cpp)
+# target_link_libraries(tests gltf ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${JSONCPP_LIBRARIES} ${Boost_LIBRARIES})
+
+#add_test(NAME miaou COMMAND tests)

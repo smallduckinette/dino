@@ -14,7 +14,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "shader.h"
-#include "parser.h"
+#include "gltf/nodecache.h"
+#include "adh/primitive.h"
 
 namespace po = boost::program_options;
 
@@ -97,7 +98,8 @@ int main(int argc, char ** argv)
     std::cout << "Version: " << version << std::endl;
     
     std::ifstream str(model);
-    auto meshes = gltf::parse(str);
+    gltf::NodeCache nodeCache(str);
+    auto primitive = nodeCache.getPrimitive(0);
     
     std::ifstream vertex("shader.vert");
     std::ifstream fragment("shader.frag");
@@ -134,10 +136,7 @@ int main(int argc, char ** argv)
       shader.setMatrix("view", view);
       shader.setMatrix("projection", projection);
       
-      for(auto && mesh : meshes)
-      {
-        mesh->draw();
-      }
+      primitive->draw();
       
       SDL_GL_SwapWindow(window.get());
 
