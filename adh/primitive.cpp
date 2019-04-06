@@ -16,13 +16,6 @@ adh::Primitive::~Primitive()
   glDeleteVertexArrays(1, &_vertexArray);
 }
 
-void adh::Primitive::draw() const
-{
-  glBindVertexArray(_vertexArray);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _elements);
-  glDrawElements(GL_TRIANGLES, _count, _type, 0);
-}
-
 void adh::Primitive::bind()
 {
   glBindVertexArray(_vertexArray);
@@ -66,4 +59,11 @@ void adh::Primitive::describeIndexData(size_t count, GLenum type)
 {
   _count = count;
   _type = type;
+}
+
+void adh::Primitive::onDraw() const
+{
+  glBindVertexArray(_vertexArray);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _elements);
+  glDrawElements(GL_TRIANGLES, _count, _type, 0);
 }

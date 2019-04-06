@@ -99,7 +99,7 @@ int main(int argc, char ** argv)
     
     std::ifstream str(model);
     gltf::NodeCache nodeCache(str);
-    auto primitive = nodeCache.getPrimitive(0);
+    auto primitive = nodeCache.getMesh(0);
     
     std::ifstream vertex("shader.vert");
     std::ifstream fragment("shader.frag");

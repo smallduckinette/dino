@@ -1,1 +1,1 @@
-add_library(adh SHARED primitive.cpp)
+add_library(adh SHARED node.cpp primitive.cpp)

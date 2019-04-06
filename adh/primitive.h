@@ -12,8 +12,6 @@ namespace adh
   public:
     Primitive();
     ~Primitive();
-    
-    void draw() const override;
 
     /// Call bind before setting arrays of data
     void bind();
@@ -38,6 +36,8 @@ namespace adh
     void describeIndexData(size_t count, GLenum type);
     
   private:
+    void onDraw() const override;
+    
     GLuint _vertexArray;
     GLuint _vertexBuffer;
     GLuint _elements;    
