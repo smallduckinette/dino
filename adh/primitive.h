@@ -36,7 +36,7 @@ namespace adh
     void describeIndexData(size_t count, GLenum type);
     
   private:
-    void onDraw() const override;
+    void draw() const override;
     
     GLuint _vertexArray;
     GLuint _vertexBuffer;

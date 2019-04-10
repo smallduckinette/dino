@@ -11,8 +11,6 @@ adh::Node::Node(const std::string & name):
 
 void adh::Node::draw() const
 {
-  onDraw();
-
   for(auto && child : _children)
   {
     child->draw();

@@ -16,15 +16,11 @@ namespace adh
     {
     }
     
-    void draw() const;
+    virtual void draw() const;
     
     void addChild(const std::shared_ptr<Node> & child);
     
   private:
-    virtual void onDraw() const
-    {
-    }
-    
     std::string _name;
     std::vector<std::shared_ptr<Node> > _children;
   };

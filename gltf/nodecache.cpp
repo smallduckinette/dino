@@ -5,6 +5,8 @@
 #include <boost/log/trivial.hpp>
 
 #include "adh/primitive.h"
+#include "adh/texture.h"
+#include "adh/material.h"
 
 #include "accessor.h"
 #include "bufferview.h"
@@ -39,7 +41,7 @@ std::shared_ptr<adh::Node> gltf::NodeCache::getMesh(size_t index)
   }
 }
 
-std::shared_ptr<adh::Primitive> gltf::NodeCache::getPrimitive(const Json::Value & primitiveDoc)
+std::shared_ptr<adh::Node> gltf::NodeCache::getPrimitive(const Json::Value & primitiveDoc)
 {
   std::vector<std::shared_ptr<Accessor> > selectedAccessors;
   selectedAccessors.push_back(getAccessor(primitiveDoc["attributes"].get("POSITION", "").asUInt()));
@@ -115,7 +117,12 @@ std::shared_ptr<adh::Primitive> gltf::NodeCache::getPrimitive(const Json::Value 
                           indicesAccessor->getSize());
   primitive->describeIndexData(indicesAccessor->getCount(),
                                indicesAccessor->getComponentType());
-  return primitive;
+  
+  // Wrap the primitive in the material
+  auto material = getMaterial(primitiveDoc.get("material", "").asUInt());
+  material->addChild(primitive);
+  
+  return material;
 }
 
 std::shared_ptr<gltf::Accessor> gltf::NodeCache::getAccessor(size_t index)
@@ -162,4 +169,42 @@ std::shared_ptr<gltf::Buffer> gltf::NodeCache::getBuffer(size_t index)
     return _bufferCache.insert({index, std::make_shared<Buffer>(_modelPath,
                                                                 bufferDoc)}).first->second;
   }    
+}
+
+std::shared_ptr<adh::Texture> gltf::NodeCache::getTexture(size_t index)
+{
+  auto it = _textureCache.find(index);
+  if(it != _textureCache.end())
+  {
+    return it->second;
+  }
+  else
+  {
+    auto && textureDoc = _document["textures"][Json::ArrayIndex(index)];
+    auto && imageDoc = _document["images"][Json::ArrayIndex(textureDoc.get("source", "").asUInt())];
+    std::string name = imageDoc.get("name", "").asString();
+    std::string uri = imageDoc.get("uri", "").asString();
+    
+    return _textureCache.insert({index, std::make_shared<adh::Texture>(name,
+                                                                       _modelPath / uri)}).first->second;
+  }
+}
+
+std::shared_ptr<adh::Material> gltf::NodeCache::getMaterial(size_t index)
+{
+  auto it = _materialCache.find(index);
+  if(it != _materialCache.end())
+  {
+    return it->second;
+  }
+  else
+  {
+    auto && materialDoc= _document["materials"][Json::ArrayIndex(index)];
+    std::string name = materialDoc.get("name", "").asString();
+    size_t textureIndex = materialDoc["pbrMetallicRoughness"]["baseColorTexture"].get("index", "").asUInt();
+    auto texture = getTexture(textureIndex);
+    
+    return _materialCache.insert({index, std::make_shared<adh::Material>(name,
+                                                                         texture)}).first->second;
+  }  
 }
