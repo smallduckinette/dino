@@ -2,6 +2,7 @@
 #define __GLTF_NODECACHE_H__
 
 #include <memory>
+#include <filesystem>
 #include <json/json.h>
 
 namespace adh { class Node; }
@@ -16,7 +17,7 @@ namespace gltf
   class NodeCache
   {
   public:
-    NodeCache(std::istream & gltfFile);
+    NodeCache(const std::string & gltfFile);
     NodeCache(const NodeCache &) = delete;
     NodeCache & operator=(const NodeCache &) = delete;
     
@@ -35,6 +36,7 @@ namespace gltf
     std::map<size_t, std::shared_ptr<gltf::BufferView> > _bufferViewCache;
     std::map<size_t, std::shared_ptr<gltf::Buffer> > _bufferCache;
     
+    std::filesystem::path _modelPath;
     Json::Value _document;
   };
 }

@@ -97,8 +97,7 @@ int main(int argc, char ** argv)
     std::cout << "Renderer: " << renderer << std::endl;
     std::cout << "Version: " << version << std::endl;
     
-    std::ifstream str(model);
-    gltf::NodeCache nodeCache(str);
+    gltf::NodeCache nodeCache(model);
     auto primitive = nodeCache.getMesh(0);
     
     std::ifstream vertex("shader.vert");

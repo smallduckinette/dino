@@ -7,7 +7,8 @@
 #include "base64.h"
 
 
-gltf::Buffer::Buffer(const Json::Value & doc)
+gltf::Buffer::Buffer(const std::filesystem::path & modelPath,
+                     const Json::Value & doc)
 {
   size_t length = doc.get("byteLength", 0).asUInt();
   std::string uri = doc.get("uri", "").asString();
@@ -19,7 +20,7 @@ gltf::Buffer::Buffer(const Json::Value & doc)
   }
   else
   {
-    std::ifstream file(uri);
+    std::ifstream file(modelPath / uri);
     std::copy(std::istreambuf_iterator<char>(file),
               std::istreambuf_iterator<char>(),
               std::back_inserter(_data));

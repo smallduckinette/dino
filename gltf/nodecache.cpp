@@ -1,6 +1,7 @@
 #include "nodecache.h"
 
 #include <numeric>
+#include <fstream>
 #include <boost/log/trivial.hpp>
 
 #include "adh/primitive.h"
@@ -10,9 +11,11 @@
 #include "buffer.h"
 
 
-gltf::NodeCache::NodeCache(std::istream & gltfFile)
+gltf::NodeCache::NodeCache(const std::string & gltfFile):
+  _modelPath(std::filesystem::path(gltfFile).parent_path())
 {
-  gltfFile >> _document;
+  std::ifstream str(gltfFile);
+  str >> _document;
 }
 
 std::shared_ptr<adh::Node> gltf::NodeCache::getMesh(size_t index)
@@ -156,6 +159,7 @@ std::shared_ptr<gltf::Buffer> gltf::NodeCache::getBuffer(size_t index)
   {
     auto && bufferDoc = _document["buffers"][Json::ArrayIndex(index)];
     
-    return _bufferCache.insert({index, std::make_shared<Buffer>(bufferDoc)}).first->second;
+    return _bufferCache.insert({index, std::make_shared<Buffer>(_modelPath,
+                                                                bufferDoc)}).first->second;
   }    
 }
