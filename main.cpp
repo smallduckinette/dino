@@ -13,9 +13,11 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "shader.h"
-#include "gltf/nodecache.h"
 #include "adh/primitive.h"
+#include "adh/camera.h"
+#include "adh/shader.h"
+#include "adh/transform.h"
+#include "gltf/nodecache.h"
 
 namespace po = boost::program_options;
 
@@ -23,13 +25,17 @@ int main(int argc, char ** argv)
 {
   try
   {
+    std::string shaderDir;
+    std::string model;
+    
     po::options_description desc("Options");
     desc.add_options()
       ("help", "Displays help")
       ("verbose,v", "Verbose logging")
       ("vsync", "enable vsync")
-      ("model,m", po::value<std::string>(), "Model to load");
-
+      ("shaders", po::value<std::string>(&shaderDir)->default_value("."), "Shader directory")
+      ("model,m", po::value<std::string>(&model), "Model to load");
+    
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
     po::notify(vm);
@@ -40,9 +46,8 @@ int main(int argc, char ** argv)
       return 0;
     }
     
-    if(!vm.count("model"))
+    if(model.empty())
       throw std::runtime_error("No model selected");
-    std::string model = vm["model"].as<std::string>();
 
     if(vm.count("verbose"))
     {
@@ -97,12 +102,15 @@ int main(int argc, char ** argv)
     std::cout << "Renderer: " << renderer << std::endl;
     std::cout << "Version: " << version << std::endl;
     
-    gltf::NodeCache nodeCache(model);
+    gltf::NodeCache nodeCache(shaderDir, model);
     auto primitive = nodeCache.getMesh(0);
-    
-    std::ifstream vertex("shader.vert");
-    std::ifstream fragment("shader.frag");
-    Shader shader(vertex, fragment);
+    auto transform = std::make_shared<adh::Transform>();
+    auto camera = std::make_shared<adh::Camera>(glm::radians(45.0f),
+                                                (float)SCR_WIDTH / (float)SCR_HEIGHT,
+                                                0.1f,
+                                                100.0f);
+    transform->addChild(primitive);
+    camera->addChild(transform);
     
     auto t1 = std::chrono::system_clock::now();
     
@@ -121,21 +129,10 @@ int main(int argc, char ** argv)
       glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       
-      shader.use();
-
-      glm::mat4 model(1.0f);
-      glm::mat4 view(1.0f);
-      glm::mat4 projection(1.0f);
-      model = glm::rotate(model, SDL_GetTicks() / 1000.0f, glm::vec3(0.5f, 1.0f, 0.0f));
-      view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
-      projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+      transform->setMatrix(glm::rotate(glm::mat4(1.0f), SDL_GetTicks() / 1000.0f, glm::vec3(0.5f, 1.0f, 0.0f)));
       
-      shader.setInteger("diffuse", 0);
-      shader.setMatrix("model", model);
-      shader.setMatrix("view", view);
-      shader.setMatrix("projection", projection);
-      
-      primitive->draw();
+      adh::Context context;
+      camera->draw(context);
       
       SDL_GL_SwapWindow(window.get());
 

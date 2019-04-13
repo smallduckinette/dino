@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "context.h"
+
 namespace adh
 {
   class Node
@@ -16,7 +18,7 @@ namespace adh
     {
     }
     
-    virtual void draw() const;
+    virtual void draw(Context & context) const;
     
     void addChild(const std::shared_ptr<Node> & child);
     

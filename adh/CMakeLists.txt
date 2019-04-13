@@ -1,3 +1,3 @@
-add_library(adh SHARED material.cpp node.cpp primitive.cpp texture.cpp)
+add_library(adh SHARED camera.cpp context.cpp material.cpp node.cpp primitive.cpp shader.cpp texture.cpp transform.cpp)
 
 target_link_libraries(adh ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARIES})

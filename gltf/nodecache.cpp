@@ -7,13 +7,16 @@
 #include "adh/primitive.h"
 #include "adh/texture.h"
 #include "adh/material.h"
+#include "adh/shader.h"
 
 #include "accessor.h"
 #include "bufferview.h"
 #include "buffer.h"
 
 
-gltf::NodeCache::NodeCache(const std::string & gltfFile):
+gltf::NodeCache::NodeCache(const std::string & shaderDir,
+                           const std::string & gltfFile):
+  _shaderPath(std::filesystem::path(shaderDir)),
   _modelPath(std::filesystem::path(gltfFile).parent_path())
 {
   std::ifstream str(gltfFile);
@@ -125,6 +128,23 @@ std::shared_ptr<adh::Node> gltf::NodeCache::getPrimitive(const Json::Value & pri
   return material;
 }
 
+std::shared_ptr<adh::Shader> gltf::NodeCache::getShader(const std::string & shaderName)
+{
+  auto it = _shaderCache.find(shaderName);
+  if(it != _shaderCache.end())
+  {
+    return it->second;
+  }
+  else
+  {
+    std::fstream vertex(_shaderPath / (shaderName + ".vert"));
+    std::fstream fragment(_shaderPath / (shaderName + ".frag"));
+    auto shader = std::make_shared<adh::Shader>(vertex, fragment);
+    
+    return _shaderCache.insert({shaderName, shader}).first->second;
+  }
+}
+
 std::shared_ptr<gltf::Accessor> gltf::NodeCache::getAccessor(size_t index)
 {
   auto it = _accessorCache.find(index);
@@ -203,8 +223,10 @@ std::shared_ptr<adh::Material> gltf::NodeCache::getMaterial(size_t index)
     std::string name = materialDoc.get("name", "").asString();
     size_t textureIndex = materialDoc["pbrMetallicRoughness"]["baseColorTexture"].get("index", "").asUInt();
     auto texture = getTexture(textureIndex);
+    auto shader = getShader("pbr");
     
     return _materialCache.insert({index, std::make_shared<adh::Material>(name,
+                                                                         shader,
                                                                          texture)}).first->second;
   }  
 }

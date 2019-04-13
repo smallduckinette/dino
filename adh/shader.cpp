@@ -4,8 +4,8 @@
 #include <iostream>
 
 
-Shader::Shader(std::istream & vertex,
-               std::istream & fragment):
+adh::Shader::Shader(std::istream & vertex,
+                    std::istream & fragment):
   _programId(glCreateProgram())
 {
   GLuint vertexId = glCreateShader(GL_VERTEX_SHADER);
@@ -30,27 +30,27 @@ Shader::Shader(std::istream & vertex,
   glDeleteShader(fragmentId);
 }
 
-Shader::~Shader()
+adh::Shader::~Shader()
 {
   glDeleteProgram(_programId);
 }
 
-void Shader::use()
+void adh::Shader::use()
 {
   glUseProgram(_programId);
 }
 
-void Shader::setMatrix(const std::string & name, const glm::mat4 & mat)
+void adh::Shader::setMatrix(const std::string & name, const glm::mat4 & mat)
 {
   glUniformMatrix4fv(glGetUniformLocation(_programId, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
-void Shader::setInteger(const std::string & name, int value)
+void adh::Shader::setInteger(const std::string & name, int value)
 {
   glUniform1i(glGetUniformLocation(_programId, name.c_str()), value);
 }
 
-void Shader::compile(GLuint id, std::istream & str) const
+void adh::Shader::compile(GLuint id, std::istream & str) const
 {
   auto source = std::string(std::istreambuf_iterator<char>(str),
                             std::istreambuf_iterator<char>());

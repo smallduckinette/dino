@@ -9,11 +9,11 @@ adh::Node::Node(const std::string & name):
 {
 }
 
-void adh::Node::draw() const
+void adh::Node::draw(Context & context) const
 {
   for(auto && child : _children)
   {
-    child->draw();
+    child->draw(context);
   }
 }
 

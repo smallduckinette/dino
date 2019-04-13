@@ -61,11 +61,11 @@ void adh::Primitive::describeIndexData(size_t count, GLenum type)
   _type = type;
 }
 
-void adh::Primitive::draw() const
+void adh::Primitive::draw(Context & context) const
 {
   glBindVertexArray(_vertexArray);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _elements);
   glDrawElements(GL_TRIANGLES, _count, _type, 0);
   
-  Node::draw();
+  Node::draw(context);
 }

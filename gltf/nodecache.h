@@ -9,6 +9,7 @@ namespace adh { class Node; }
 namespace adh { class Primitive; }
 namespace adh { class Texture; }
 namespace adh { class Material; }
+namespace adh { class Shader; }
 
 namespace gltf
 {
@@ -19,7 +20,8 @@ namespace gltf
   class NodeCache
   {
   public:
-    NodeCache(const std::string & gltfFile);
+    NodeCache(const std::string & shaderDir,
+              const std::string & gltfFile);
     NodeCache(const NodeCache &) = delete;
     NodeCache & operator=(const NodeCache &) = delete;
     
@@ -33,6 +35,7 @@ namespace gltf
     
   private:
     std::shared_ptr<adh::Node> getPrimitive(const Json::Value & primitiveDoc);
+    std::shared_ptr<adh::Shader> getShader(const std::string & shaderName);
     
     std::map<size_t, std::shared_ptr<adh::Node> > _meshCache;
     
@@ -41,7 +44,9 @@ namespace gltf
     std::map<size_t, std::shared_ptr<gltf::Buffer> > _bufferCache;
     std::map<size_t, std::shared_ptr<adh::Texture> > _textureCache;
     std::map<size_t, std::shared_ptr<adh::Material> > _materialCache;
+    std::map<std::string, std::shared_ptr<adh::Shader> > _shaderCache;
     
+    std::filesystem::path _shaderPath;
     std::filesystem::path _modelPath;
     Json::Value _document;
   };
