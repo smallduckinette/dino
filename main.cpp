@@ -63,8 +63,8 @@ int main(int argc, char ** argv)
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
       throw std::runtime_error(std::string("Failed to init SDL : ") + SDL_GetError());
 
-    const int SCR_WIDTH = 512;
-    const int SCR_HEIGHT = 512;
+    const int SCR_WIDTH = 800;
+    const int SCR_HEIGHT = 600;
     
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
@@ -99,8 +99,8 @@ int main(int argc, char ** argv)
     const GLubyte* renderer = glGetString(GL_RENDERER); // get renderer string
     const GLubyte* version = glGetString(GL_VERSION); // version as a string
     
-    std::cout << "Renderer: " << renderer << std::endl;
-    std::cout << "Version: " << version << std::endl;
+    BOOST_LOG_TRIVIAL(info) << "Renderer: " << renderer << std::endl;
+    BOOST_LOG_TRIVIAL(info) << "Version: " << version << std::endl;
     
     gltf::NodeCache nodeCache(shaderDir, model);
     auto primitive = nodeCache.getMesh(0);
@@ -138,7 +138,7 @@ int main(int argc, char ** argv)
 
       auto t2 = std::chrono::system_clock::now();
       std::chrono::duration<double> d = (t2 - t1);
-      std::cout << 1 / d.count() << std::endl;
+      BOOST_LOG_TRIVIAL(debug) << 1 / d.count() << std::endl;
       t1 = t2;
     }
   }

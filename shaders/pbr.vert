@@ -9,9 +9,11 @@ uniform mat4 view;
 uniform mat4 projection;
 
 out vec2 Tex;
+out vec3 Normal;
 
 void main()
 {
    gl_Position = projection * view * model * vec4(aPos, 1.0f);
    Tex = vec2(aTex.x, aTex.y);
+   Normal = vec3(normalize(model * vec4(aNorm, 1.0f)));
 }

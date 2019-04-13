@@ -18,6 +18,8 @@ void adh::Material::draw(Context & context) const
   _shader->setMatrix("model", context._model);
   _shader->setMatrix("view", context._view);
   _shader->setMatrix("projection", context._projection);
+  _shader->setVector("lightDirection", context._lightDirection);
+  _shader->setVector("lightColor", context._lightColor);
   
   Node::draw(context);
 }

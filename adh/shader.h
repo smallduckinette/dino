@@ -20,6 +20,7 @@ namespace adh
     void use();
     
     void setMatrix(const std::string & name, const glm::mat4 & mat);
+    void setVector(const std::string & name, const glm::vec3 & vec);
     void setInteger(const std::string & name, int value);
     
   private:

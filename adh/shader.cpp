@@ -45,6 +45,11 @@ void adh::Shader::setMatrix(const std::string & name, const glm::mat4 & mat)
   glUniformMatrix4fv(glGetUniformLocation(_programId, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
+void adh::Shader::setVector(const std::string & name, const glm::vec3 & vec)
+{
+  glUniform3fv(glGetUniformLocation(_programId, name.c_str()), 1, &vec[0]);
+}
+
 void adh::Shader::setInteger(const std::string & name, int value)
 {
   glUniform1i(glGetUniformLocation(_programId, name.c_str()), value);
