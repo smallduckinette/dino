@@ -1,0 +1,161 @@
+{
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5126,
+            "count" : 650,
+            "max" : [
+                1.25,
+                0.25,
+                1.25
+            ],
+            "min" : [
+                -1.25,
+                -0.25,
+                -1.25
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 650,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 650,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5126,
+            "count" : 650,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 4,
+            "componentType" : 5123,
+            "count" : 3456,
+            "type" : "SCALAR"
+        }
+    ],
+    "asset" : {
+        "generator" : "Khronos Blender glTF 2.0 I/O",
+        "version" : "2.0"
+    },
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 7800,
+            "byteOffset" : 0
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 7800,
+            "byteOffset" : 7800
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 10400,
+            "byteOffset" : 15600
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 5200,
+            "byteOffset" : 26000
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 6912,
+            "byteOffset" : 31200
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 38112,
+            "uri" : "torus.bin"
+        }
+    ],
+    "extensions" : {},
+    "images" : [
+        {
+            "mimeType" : "image/png",
+            "name" : "normal",
+            "uri" : "normal.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "diffuse",
+            "uri" : "diffuse.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "metallic",
+            "uri" : "metallicroughness.png"
+        }
+    ],
+    "materials" : [
+        {
+            "name" : "Material",
+            "normalTexture" : {
+                "index" : 0,
+                "texCoord" : 0
+            },
+            "pbrMetallicRoughness" : {
+                "baseColorTexture" : {
+                    "index" : 1,
+                    "texCoord" : 0
+                },
+                "metallicRoughnessTexture" : {
+                    "index" : 2,
+                    "texCoord" : 0
+                }
+            }
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "Torus",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "NORMAL" : 1,
+                        "POSITION" : 0,
+                        "TANGENT" : 2,
+                        "TEXCOORD_0" : 3
+                    },
+                    "indices" : 4,
+                    "material" : 0
+                }
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "mesh" : 0,
+            "name" : "Torus"
+        }
+    ],
+    "scene" : 0,
+    "scenes" : [
+        {
+            "name" : "Scene",
+            "nodes" : [
+                0
+            ]
+        }
+    ],
+    "textures" : [
+        {
+            "source" : 0
+        },
+        {
+            "source" : 1
+        },
+        {
+            "source" : 2
+        }
+    ]
+}
