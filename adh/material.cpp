@@ -15,10 +15,12 @@ adh::Material::Material(const std::string & name,
 void adh::Material::draw(Context & context) const
 {
   _shader->use();
-  _shader->setMatrix("model", context._model);
-  _shader->setMatrix("view", context._view);
-  _shader->setMatrix("projection", context._projection);
-  _shader->setVector("lightDirection", context._lightDirection);
+  _shader->setMatrix("modelMatrix", context._model);
+  _shader->setMatrix("viewMatrix", context._view);
+  _shader->setMatrix("projectionMatrix", context._projection);
+  _shader->setMatrix("normalMatrix", glm::transpose(glm::inverse(context._model)));
+  _shader->setVector("camPos", context._camPos);
+  _shader->setVector("lightPosition", context._lightPosition);
   _shader->setVector("lightColor", context._lightColor);
   
   Node::draw(context);

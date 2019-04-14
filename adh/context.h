@@ -13,8 +13,9 @@ namespace adh
     glm::mat4 _model;
     glm::mat4 _view;
     glm::mat4 _projection;
+    glm::vec3 _camPos;
     
-    glm::vec3 _lightDirection;
+    glm::vec3 _lightPosition;
     glm::vec3 _lightColor;
   };
 }
