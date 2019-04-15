@@ -49,6 +49,7 @@ std::shared_ptr<adh::Node> gltf::NodeCache::getPrimitive(const Json::Value & pri
   std::vector<std::shared_ptr<Accessor> > selectedAccessors;
   selectedAccessors.push_back(getAccessor(primitiveDoc["attributes"].get("POSITION", "").asUInt()));
   selectedAccessors.push_back(getAccessor(primitiveDoc["attributes"].get("NORMAL", "").asUInt()));
+  selectedAccessors.push_back(getAccessor(primitiveDoc["attributes"].get("TANGENT", "").asUInt()));
   selectedAccessors.push_back(getAccessor(primitiveDoc["attributes"].get("TEXCOORD_0", "").asUInt()));
   
   for(auto && accessor : selectedAccessors)
@@ -221,12 +222,19 @@ std::shared_ptr<adh::Material> gltf::NodeCache::getMaterial(size_t index)
   {
     auto && materialDoc= _document["materials"][Json::ArrayIndex(index)];
     std::string name = materialDoc.get("name", "").asString();
-    size_t textureIndex = materialDoc["pbrMetallicRoughness"]["baseColorTexture"].get("index", "").asUInt();
-    auto texture = getTexture(textureIndex);
+    size_t diffuseTextureIndex = materialDoc["pbrMetallicRoughness"]["baseColorTexture"].get("index", "").asUInt();
+    size_t metalRoughnessIndex = materialDoc["pbrMetallicRoughness"]["metallicRoughnessTexture"].get("index", "").asUInt();
+    size_t normalTextureIndex = materialDoc["normalTexture"].get("index", "").asUInt();
+    auto diffuseTexture = getTexture(diffuseTextureIndex);
+    auto normalTexture = getTexture(normalTextureIndex);
+    auto metalRoughnessTexture = getTexture(metalRoughnessIndex);
+    
     auto shader = getShader("pbr");
     
     return _materialCache.insert({index, std::make_shared<adh::Material>(name,
                                                                          shader,
-                                                                         texture)}).first->second;
+                                                                         diffuseTexture,
+                                                                         normalTexture,
+                                                                         metalRoughnessTexture)}).first->second;
   }  
 }

@@ -18,6 +18,8 @@ gltf::Accessor::Accessor(const Json::Value & doc,
     _typeSize = 2;
   else if(type == "VEC3")
     _typeSize = 3;
+  else if(type == "VEC4")
+    _typeSize = 4;
   else
     throw std::runtime_error("Unknown type " + type);
   

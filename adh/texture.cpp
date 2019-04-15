@@ -47,8 +47,8 @@ adh::Texture::~Texture()
   glDeleteTextures(1, &_textureId);
 }
 
-void adh::Texture::bind()
+void adh::Texture::bind(GLenum texture)
 {
-  glActiveTexture(GL_TEXTURE0);
+  glActiveTexture(texture);
   glBindTexture(GL_TEXTURE_2D, _textureId);  
 }

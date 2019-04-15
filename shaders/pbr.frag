@@ -4,9 +4,14 @@ out vec4 FragColor;
 in vec2 Tex;
 in vec3 World;
 in vec3 Normal;
+in vec3 TanLightPos;
+in vec3 TanViewPos;
+in vec3 TanFragPos;
 
 
-uniform sampler2D diffuse;
+uniform sampler2D diffuseMap;
+uniform sampler2D normalMap;
+uniform sampler2D metalroughnessMap;
 uniform vec3 camPos;
 uniform vec3 lightPosition;
 uniform vec3 lightColor;
@@ -55,41 +60,45 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 
 void main()
 {
-   float roughness = 0.3;
-   vec3 albedo = vec3(texture(diffuse, Tex));
-
-   vec3 n = normalize(Normal);
-   vec3 v = normalize(camPos - World);
+   vec3 mr = vec3(texture(metalroughnessMap, Tex));
+   float metallic = mr.g;
+   float roughness = mr.r;
+   vec3 albedo = vec3(texture(diffuseMap, Tex));
+   
+   vec3 n = vec3(texture(normalMap, Tex));
+   n = normalize(n * 2.0 - 1.0);
+   
+   vec3 v = normalize(TanViewPos - TanFragPos);
    
    vec3 f0 = vec3(0.04);   
-   //f0 = mix(f0, albedo, metallic);
-
-   vec3 l = normalize(lightPosition - World);
+   f0 = mix(f0, albedo, metallic);
+   
+   vec3 l = normalize(TanLightPos - TanFragPos);
    vec3 h = normalize(v + l);
-   float distance = length(lightPosition - World);
+   float distance = length(TanLightPos - TanFragPos);
    float attenuation = 1.0;// / (distance * distance);
    vec3 radiance = lightColor * attenuation;
-
+   
    // Cook-Torrance BRDF
    float ndf = DistributionGGX(n, h, roughness);
    float g = GeometrySmith(n, v, l, roughness);
    vec3 f = fresnelSchlick(clamp(dot(h, v), 0.0, 1.0), f0);
-
+   
    vec3 nominator = ndf * g * f;
    float denominator = 4 * max(dot(n, v), 0.0) * max(dot(n, l), 0.0);
    vec3 specular = nominator / max(denominator, 0.001);
-
+   
    vec3 ks = f;
    vec3 kd = vec3(1.0) - ks;
-
-   // kd *= 1.0 - metallic;
-
+   
+   kd *= 1.0 - metallic;
+   
    float NdotL = max(dot(n, l), 0.0);
-
+   
    vec3 color = (kd * albedo / PI + specular) * radiance * NdotL;
-
+   
    color = color / (color + vec3(1.0));
    color = pow(color, vec3(1.0/2.2));
-
+   
    FragColor = vec4(color, 1.0);
 }
