@@ -16,7 +16,12 @@ uniform vec4 diffuseColor;
 uniform sampler2D normalMap;
 #endif
 
+#ifdef HAS_METALROUGHNESS_TEXTURE
 uniform sampler2D metalroughnessMap;
+#else
+uniform vec4 mr;
+#endif
+
 uniform vec3 camPos;
 uniform vec3 lightPosition;
 uniform vec3 lightColor;
@@ -65,9 +70,14 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 
 void main()
 {
+#ifdef HAS_METALROUGHNESS_TEXTURE
    vec3 mr = vec3(texture(metalroughnessMap, Tex));
    float metallic = mr.g;
    float roughness = mr.r;
+#else
+   float metallic = mr.g;
+   float roughness = mr.r;
+#endif
 
 #ifdef HAS_DIFFUSE_TEXTURE
    vec3 albedo = vec3(texture(diffuseMap, Tex));

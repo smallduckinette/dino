@@ -265,6 +265,16 @@ std::shared_ptr<adh::Material> gltf::NodeCache::getMaterial(size_t index)
       colors.push_back(metalRoughnessColor);
       defines.push_back("HAS_METALROUGHNESS_TEXTURE");
     }
+    else if(pbrDoc.isMember("metallicFactor") && pbrDoc.isMember("roughnessFactor"))
+    {
+      auto metal = pbrDoc["metallicFactor"].asFloat();
+      auto roughness = pbrDoc["roughnessFactor"].asFloat();
+      auto metalRoughness = glm::vec4(roughness, metal, 0, 0);
+      auto metalRoughnessColor = std::make_shared<adh::PlainColor>("mr",
+                                                                   metalRoughness);
+      colors.push_back(metalRoughnessColor);
+    }
+    else throw std::runtime_error("Missing metal roughness information");
     
     if(materialDoc.isMember("normalTexture"))
     {
