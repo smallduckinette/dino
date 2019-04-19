@@ -140,7 +140,9 @@ std::shared_ptr<adh::Shader> gltf::NodeCache::getShader(const std::string & shad
   {
     std::fstream vertex(_shaderPath / (shaderName + ".vert"));
     std::fstream fragment(_shaderPath / (shaderName + ".frag"));
-    auto shader = std::make_shared<adh::Shader>(vertex, fragment);
+    auto shader = std::make_shared<adh::Shader>(vertex,
+                                                fragment,
+                                                std::vector<std::string>{"HAS_DIFFUSE_TEXTURE"});
     
     return _shaderCache.insert({shaderName, shader}).first->second;
   }

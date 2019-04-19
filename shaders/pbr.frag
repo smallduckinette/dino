@@ -1,5 +1,3 @@
-#version 330 core
-
 out vec4 FragColor;
 in vec2 Tex;
 in vec3 World;
@@ -8,8 +6,10 @@ in vec3 TanLightPos;
 in vec3 TanViewPos;
 in vec3 TanFragPos;
 
-
+#ifdef HAS_DIFFUSE_TEXTURE
 uniform sampler2D diffuseMap;
+#endif
+
 uniform sampler2D normalMap;
 uniform sampler2D metalroughnessMap;
 uniform vec3 camPos;
@@ -63,7 +63,12 @@ void main()
    vec3 mr = vec3(texture(metalroughnessMap, Tex));
    float metallic = mr.g;
    float roughness = mr.r;
+
+#ifdef HAS_DIFFUSE_TEXTURE
    vec3 albedo = vec3(texture(diffuseMap, Tex));
+#else
+   vec3 albedo = vec3(1, 1, 1);
+#endif
    
    vec3 n = vec3(texture(normalMap, Tex));
    n = normalize(n * 2.0 - 1.0);
