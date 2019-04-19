@@ -35,7 +35,8 @@ namespace gltf
     
   private:
     std::shared_ptr<adh::Node> getPrimitive(const Json::Value & primitiveDoc);
-    std::shared_ptr<adh::Shader> getShader(const std::string & shaderName);
+    std::shared_ptr<adh::Shader> getShader(const std::string & shaderName,
+                                           const std::vector<std::string> & defines);
     
     std::map<size_t, std::shared_ptr<adh::Node> > _meshCache;
     
@@ -44,7 +45,7 @@ namespace gltf
     std::map<size_t, std::shared_ptr<gltf::Buffer> > _bufferCache;
     std::map<size_t, std::shared_ptr<adh::Texture> > _textureCache;
     std::map<size_t, std::shared_ptr<adh::Material> > _materialCache;
-    std::map<std::string, std::shared_ptr<adh::Shader> > _shaderCache;
+    std::map<std::pair<std::string, std::vector<std::string> >, std::shared_ptr<adh::Shader> > _shaderCache;
     
     std::filesystem::path _shaderPath;
     std::filesystem::path _modelPath;

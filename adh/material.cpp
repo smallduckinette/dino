@@ -2,17 +2,14 @@
 
 #include "texture.h"
 #include "shader.h"
+#include "color.h"
 
 adh::Material::Material(const std::string & name,
                         const std::shared_ptr<Shader> & shader,
-                        const std::shared_ptr<Texture> & diffuseTexture,
-                        const std::shared_ptr<Texture> & normalTexture,
-                        const std::shared_ptr<Texture> & metalRoughnessTexture):
+                        const std::vector<std::shared_ptr<Color> > & colors):
   Node(name),
   _shader(shader),
-  _diffuseTexture(diffuseTexture),
-  _normalTexture(normalTexture),
-  _metalRoughnessTexture(metalRoughnessTexture)
+  _colors(colors)
 {
 }
 
@@ -26,13 +23,11 @@ void adh::Material::draw(Context & context) const
   _shader->setVector("camPos", context._camPos);
   _shader->setVector("lightPosition", context._lightPosition);
   _shader->setVector("lightColor", context._lightColor);
-  _shader->setInteger("diffuseMap", 0);
-  _shader->setInteger("normalMap", 1);
-  _shader->setInteger("metalroughnessMap", 2);
-
-  _diffuseTexture->bind(GL_TEXTURE0);
-  _normalTexture->bind(GL_TEXTURE1);
-  _metalRoughnessTexture->bind(GL_TEXTURE2);
+  
+  for(auto && color : _colors)
+  {
+    color->bind(*_shader);
+  }
   
   Node::draw(context);
 }

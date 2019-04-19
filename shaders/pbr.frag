@@ -8,9 +8,14 @@ in vec3 TanFragPos;
 
 #ifdef HAS_DIFFUSE_TEXTURE
 uniform sampler2D diffuseMap;
+#else
+uniform vec4 diffuseColor;
 #endif
 
+#ifdef HAS_NORMAL_TEXTURE
 uniform sampler2D normalMap;
+#endif
+
 uniform sampler2D metalroughnessMap;
 uniform vec3 camPos;
 uniform vec3 lightPosition;
@@ -67,11 +72,15 @@ void main()
 #ifdef HAS_DIFFUSE_TEXTURE
    vec3 albedo = vec3(texture(diffuseMap, Tex));
 #else
-   vec3 albedo = vec3(1, 1, 1);
+   vec3 albedo = vec3(diffuseColor);
 #endif
-   
+
+#ifdef HAS_NORMAL_TEXTURE
    vec3 n = vec3(texture(normalMap, Tex));
    n = normalize(n * 2.0 - 1.0);
+#else
+   vec3 n = vec3(0, 0, 1);
+#endif
    
    vec3 v = normalize(TanViewPos - TanFragPos);
    

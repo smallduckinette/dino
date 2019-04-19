@@ -8,6 +8,8 @@
 #include "adh/texture.h"
 #include "adh/material.h"
 #include "adh/shader.h"
+#include "adh/texturecolor.h"
+#include "adh/plaincolor.h"
 
 #include "accessor.h"
 #include "bufferview.h"
@@ -129,9 +131,11 @@ std::shared_ptr<adh::Node> gltf::NodeCache::getPrimitive(const Json::Value & pri
   return material;
 }
 
-std::shared_ptr<adh::Shader> gltf::NodeCache::getShader(const std::string & shaderName)
+std::shared_ptr<adh::Shader> gltf::NodeCache::getShader(const std::string & shaderName,
+                                                        const std::vector<std::string> & defines)
 {
-  auto it = _shaderCache.find(shaderName);
+  auto key = std::make_pair(shaderName, defines);
+  auto it = _shaderCache.find(key);
   if(it != _shaderCache.end())
   {
     return it->second;
@@ -142,9 +146,9 @@ std::shared_ptr<adh::Shader> gltf::NodeCache::getShader(const std::string & shad
     std::fstream fragment(_shaderPath / (shaderName + ".frag"));
     auto shader = std::make_shared<adh::Shader>(vertex,
                                                 fragment,
-                                                std::vector<std::string>{"HAS_DIFFUSE_TEXTURE"});
+                                                defines);
     
-    return _shaderCache.insert({shaderName, shader}).first->second;
+    return _shaderCache.insert({key, shader}).first->second;
   }
 }
 
@@ -224,19 +228,60 @@ std::shared_ptr<adh::Material> gltf::NodeCache::getMaterial(size_t index)
   {
     auto && materialDoc= _document["materials"][Json::ArrayIndex(index)];
     std::string name = materialDoc.get("name", "").asString();
-    size_t diffuseTextureIndex = materialDoc["pbrMetallicRoughness"]["baseColorTexture"].get("index", "").asUInt();
-    size_t metalRoughnessIndex = materialDoc["pbrMetallicRoughness"]["metallicRoughnessTexture"].get("index", "").asUInt();
-    size_t normalTextureIndex = materialDoc["normalTexture"].get("index", "").asUInt();
-    auto diffuseTexture = getTexture(diffuseTextureIndex);
-    auto normalTexture = getTexture(normalTextureIndex);
-    auto metalRoughnessTexture = getTexture(metalRoughnessIndex);
     
-    auto shader = getShader("pbr");
+    auto && pbrDoc = materialDoc["pbrMetallicRoughness"];
+    std::vector<std::shared_ptr<adh::Color> > colors;
+    std::vector<std::string> defines;
+
+    if(pbrDoc.isMember("baseColorTexture"))
+    {
+      size_t diffuseTextureIndex = pbrDoc["baseColorTexture"].get("index", "").asUInt();
+      auto diffuseTexture = getTexture(diffuseTextureIndex);
+      auto diffuseColor = std::make_shared<adh::TextureColor>(diffuseTexture,
+                                                              GL_TEXTURE0,
+                                                              "diffuseMap");
+      colors.push_back(diffuseColor);
+      defines.push_back("HAS_DIFFUSE_TEXTURE");
+    }
+    else if(pbrDoc.isMember("baseColorFactor"))
+    {
+      auto diffuse = glm::vec4(pbrDoc["baseColorFactor" ][0].asFloat(),
+                               pbrDoc["baseColorFactor" ][1].asFloat(),
+                               pbrDoc["baseColorFactor" ][2].asFloat(),
+                               pbrDoc["baseColorFactor"][3].asFloat());
+      auto diffuseColor = std::make_shared<adh::PlainColor>("diffuseColor",
+                                                            diffuse);
+      colors.push_back(diffuseColor);
+    }
+    else throw std::runtime_error("Missing diffuse color information");
+    
+    if(pbrDoc.isMember("metallicRoughnessTexture"))
+    {
+      size_t metalRoughnessIndex = materialDoc["pbrMetallicRoughness"]["metallicRoughnessTexture"].get("index", "").asUInt();
+      auto metalRoughnessTexture = getTexture(metalRoughnessIndex);
+      auto metalRoughnessColor = std::make_shared<adh::TextureColor>(metalRoughnessTexture,
+                                                                     GL_TEXTURE2,
+                                                                     "metalroughnessMap");
+      colors.push_back(metalRoughnessColor);
+      defines.push_back("HAS_METALROUGHNESS_TEXTURE");
+    }
+    
+    if(materialDoc.isMember("normalTexture"))
+    {
+      size_t normalTextureIndex = materialDoc["normalTexture"].get("index", "").asUInt();
+      auto normalTexture = getTexture(normalTextureIndex);
+      auto normalColor = std::make_shared<adh::TextureColor>(normalTexture,
+                                                             GL_TEXTURE1,
+                                                             "normalMap");
+      colors.push_back(normalColor);
+      defines.push_back("HAS_NORMAL_TEXTURE");
+    }
+    // Else do nothing
+    
+    auto shader = getShader("pbr", defines);
     
     return _materialCache.insert({index, std::make_shared<adh::Material>(name,
                                                                          shader,
-                                                                         diffuseTexture,
-                                                                         normalTexture,
-                                                                         metalRoughnessTexture)}).first->second;
+                                                                         colors)}).first->second;
   }  
 }
