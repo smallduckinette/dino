@@ -51,8 +51,12 @@ std::shared_ptr<adh::Node> gltf::NodeCache::getPrimitive(const Json::Value & pri
   std::vector<std::shared_ptr<Accessor> > selectedAccessors;
   selectedAccessors.push_back(getAccessor(primitiveDoc["attributes"].get("POSITION", "").asUInt()));
   selectedAccessors.push_back(getAccessor(primitiveDoc["attributes"].get("NORMAL", "").asUInt()));
-  selectedAccessors.push_back(getAccessor(primitiveDoc["attributes"].get("TANGENT", "").asUInt()));
   selectedAccessors.push_back(getAccessor(primitiveDoc["attributes"].get("TEXCOORD_0", "").asUInt()));
+  
+  if(primitiveDoc["attributes"].isMember("TANGENT"))
+  {
+    selectedAccessors.push_back(getAccessor(primitiveDoc["attributes"].get("TANGENT", "").asUInt()));
+  }
   
   for(auto && accessor : selectedAccessors)
   {

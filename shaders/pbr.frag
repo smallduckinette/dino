@@ -2,9 +2,9 @@ out vec4 FragColor;
 in vec2 Tex;
 in vec3 World;
 in vec3 Normal;
-in vec3 TanLightPos;
-in vec3 TanViewPos;
-in vec3 TanFragPos;
+in vec3 LightPos;
+in vec3 ViewPos;
+in vec3 FragPos;
 
 #ifdef HAS_DIFFUSE_TEXTURE
 uniform sampler2D diffuseMap;
@@ -89,17 +89,17 @@ void main()
    vec3 n = vec3(texture(normalMap, Tex));
    n = normalize(n * 2.0 - 1.0);
 #else
-   vec3 n = vec3(0, 0, 1);
+   vec3 n = Normal;
 #endif
    
-   vec3 v = normalize(TanViewPos - TanFragPos);
+   vec3 v = normalize(ViewPos - FragPos);
    
    vec3 f0 = vec3(0.04);   
    f0 = mix(f0, albedo, metallic);
    
-   vec3 l = normalize(TanLightPos - TanFragPos);
+   vec3 l = normalize(LightPos - FragPos);
    vec3 h = normalize(v + l);
-   float distance = length(TanLightPos - TanFragPos);
+   float distance = length(LightPos - FragPos);
    float attenuation = 1.0;// / (distance * distance);
    vec3 radiance = lightColor * attenuation;
    
@@ -116,9 +116,9 @@ void main()
    vec3 kd = vec3(1.0) - ks;
    
    kd *= 1.0 - metallic;
-   
+
    float NdotL = max(dot(n, l), 0.0);
-   
+
    vec3 color = (kd * albedo / PI + specular) * radiance * NdotL;
    
    color = color / (color + vec3(1.0));
