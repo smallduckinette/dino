@@ -25,8 +25,9 @@ namespace gltf
     NodeCache(const NodeCache &) = delete;
     NodeCache & operator=(const NodeCache &) = delete;
     
-    std::shared_ptr<adh::Node> getMesh(size_t index);
+    std::shared_ptr<adh::Node> getScene();
     
+    std::shared_ptr<adh::Node> getMesh(size_t index);
     std::shared_ptr<Accessor> getAccessor(size_t index);
     std::shared_ptr<BufferView> getBufferView(size_t index);
     std::shared_ptr<Buffer> getBuffer(size_t index);

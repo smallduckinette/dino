@@ -103,7 +103,7 @@ int main(int argc, char ** argv)
     BOOST_LOG_TRIVIAL(info) << "Version: " << version << std::endl;
     
     gltf::NodeCache nodeCache(shaderDir, model);
-    auto primitive = nodeCache.getMesh(0);
+    auto primitive = nodeCache.getScene();
     auto transform = std::make_shared<adh::Transform>();
     auto camera = std::make_shared<adh::Camera>(glm::radians(45.0f),
                                                 (float)SCR_WIDTH / (float)SCR_HEIGHT,

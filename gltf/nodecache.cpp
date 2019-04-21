@@ -10,6 +10,7 @@
 #include "adh/shader.h"
 #include "adh/texturecolor.h"
 #include "adh/plaincolor.h"
+#include "adh/transform.h"
 
 #include "accessor.h"
 #include "bufferview.h"
@@ -23,6 +24,48 @@ gltf::NodeCache::NodeCache(const std::string & shaderDir,
 {
   std::ifstream str(gltfFile);
   str >> _document;
+}
+
+std::shared_ptr<adh::Node> gltf::NodeCache::getScene()
+{
+  auto sceneIndex = _document["scene"].asUInt();
+  auto scene = _document["scenes"][Json::ArrayIndex(sceneIndex)];
+  auto object = std::make_shared<adh::Node>(scene["name"].asString());
+  
+  for(auto && nodeIndex : scene["nodes"])
+  {
+    auto && node = _document["nodes"][Json::ArrayIndex(nodeIndex.asUInt())];
+    if(node.isMember("mesh")) // Ignore non-mesh nodes
+    {
+      // Create a transform node
+      auto transform = std::make_shared<adh::Transform>();
+      object->addChild(transform);
+      transform->addChild(getMesh(node["mesh"].asUInt()));
+
+      // Apply all the transformations we can find
+      if(node.isMember("translation"))
+      {
+        transform->setTranslate(glm::vec3(node["translation"][0].asFloat(),
+                                          node["translation"][1].asFloat(),
+                                          node["translation"][2].asFloat()));
+      }
+      if(node.isMember("rotation"))
+      {
+        transform->setRotate(glm::quat(node["rotation"][0].asFloat(),
+                                       node["rotation"][1].asFloat(),
+                                       node["rotation"][2].asFloat(),
+                                       node["rotation"][3].asFloat()));
+      }
+      if(node.isMember("scale"))
+      {
+        transform->setScale(glm::vec3(node["scale"][0].asFloat(),
+                                      node["scale"][1].asFloat(),
+                                      node["scale"][2].asFloat()));
+      }
+    }
+  }
+  
+  return object;
 }
 
 std::shared_ptr<adh::Node> gltf::NodeCache::getMesh(size_t index)

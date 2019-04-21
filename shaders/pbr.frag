@@ -89,7 +89,7 @@ void main()
    vec3 n = vec3(texture(normalMap, Tex));
    n = normalize(n * 2.0 - 1.0);
 #else
-   vec3 n = Normal;
+   vec3 n = normalize(Normal);
 #endif
    
    vec3 v = normalize(ViewPos - FragPos);
