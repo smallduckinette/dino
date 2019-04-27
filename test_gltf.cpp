@@ -1,21 +1,39 @@
 #include <boost/test/unit_test.hpp>
 
-#include <fstream>
-#include <json/json.h>
+#include <iostream>
+#include "gltf/asset.h"
 
-#include "buffer.h"
-#include "parser.h"
+namespace std
+{
+  template<typename T>
+  ostream & operator<<(ostream & str, const optional<T> & opt)
+  {
+    str << "{";
+    if(opt)
+      str << *opt;
+    str << "}";
+    return str;
+  }
+}
 
 BOOST_AUTO_TEST_SUITE(Gltf)
 
-BOOST_AUTO_TEST_CASE(testLoadAccessors)
+BOOST_AUTO_TEST_CASE(testLoadSimpleAsset)
 {
-  std::ifstream str("cube.gltf");
-  Json::Value doc;
-  str >> doc;
+  gltf::Asset asset("../models/samples/plain.gltf");
+
+  // Scene
+  {
+    BOOST_TEST(0 == asset._scene);
+  }
   
-  auto accessors = gltf::loadAccessors(doc);
-  BOOST_CHECK_EQUAL(4, accessors.size());
+  // Scenes
+  {
+    BOOST_TEST(1 == asset._scenes.size());
+    BOOST_CHECK_EQUAL("Scene", asset._scenes.at(0)._name);
+    std::vector<size_t> expectedNodes{0, 1, 2};
+    BOOST_TEST(expectedNodes == asset._scenes.at(0)._nodes, boost::test_tools::per_element());
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
