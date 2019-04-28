@@ -17,6 +17,10 @@ namespace gltf
     
     void parse(const std::string & label,
                const Json::Value * node,
+               unsigned int & value);
+    
+    void parse(const std::string & label,
+               const Json::Value * node,
                std::string & value);
 
     void parse(const std::string & label,
@@ -86,6 +90,76 @@ namespace gltf
         detail::parse("array " + name, &item, value);
         values.push_back(value);
       }
+    }
+  }
+  
+  template<typename T>
+  void get(const Json::Value & document,
+           const std::string & name,
+           std::map<std::string, T> & values)
+  {
+    values.clear();
+    auto node = getNode(document, name);
+    if(node)
+    {
+      if(node->type() == Json::ValueType::objectValue)
+      {
+        auto members = node->getMemberNames();
+        for(auto && member : members)
+        {
+          T value;
+          get(*node, member, value);
+          values.insert({member, value});
+        }
+      }
+      else
+        throw std::runtime_error("Node " + name + " is not an object value");
+    }
+  }
+
+  template<typename T>
+  void get(const Json::Value & document,
+           const std::string & name,
+           std::vector<std::map<std::string, T> > & values)
+  {
+    values.clear();
+    auto node = getNode(document, name);
+    if(node)
+    {
+      for(auto && item : *node)
+      {
+        if(item.type() == Json::ValueType::objectValue)
+        {
+          std::map<std::string, T> innerValues;
+          auto members = item.getMemberNames();
+          for(auto && member : members)
+          {
+            T value;
+            get(item, member, value);
+            innerValues.insert({member, value});
+          }
+          values.push_back(innerValues);
+        }
+        else
+          throw std::runtime_error("Node " + name + " is not an object value list");
+      }
+    }
+  }
+  
+  template<typename T>
+  void get(const Json::Value & document,
+           const std::string & name,
+           T & value,
+           const T defaultValue)
+  {
+    auto node = getNode(document, name);
+    if(node)
+    {
+      get(document, name, value);
+    }
+    else
+    {
+      value = defaultValue;
     }
   }
 }

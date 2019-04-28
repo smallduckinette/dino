@@ -36,6 +36,22 @@ namespace std
     str << "}";
     return str;
   }
+
+  template<typename T, typename U>
+  ostream & operator<<(ostream & str, const map<T, U> & values)
+  {
+    str << "[";
+    bool first = true;
+    for(auto && item : values)
+    {
+      if(!first)
+        str << ", ";
+      str << item.first <<  " -> " << item.second;
+      first = false;      
+    }
+    str << "]";
+    return str;
+  }
   
   template<typename T>
   ostream & operator<<(ostream & str, const vector<T> & values)
@@ -51,7 +67,7 @@ namespace std
     }
     str << "]";
     return str;
-  }  
+  }
 }
 
 namespace
@@ -72,6 +88,10 @@ namespace
       return((left && right) || (!left && !right));
   }
 }
+
+////////////////////
+// Scene
+////////////////////
 
 gltf::Scene::Scene(const Json::Value & sceneDocument)
 {
@@ -101,6 +121,10 @@ std::ostream & gltf::operator<<(std::ostream & str, const Scene & scene)
       << ">";
   return str;
 }
+
+////////////////////
+// Node
+////////////////////
 
 gltf::Node::Node(const Json::Value & nodeDocument)
 {
@@ -171,6 +195,103 @@ std::ostream & gltf::operator<<(std::ostream & str, const Node & node)
   return str;
 }
 
+////////////////////
+// Primitive
+////////////////////
+
+gltf::Primitive::Primitive(const Json::Value & primitiveDocument)
+{
+  get(primitiveDocument, "attributes", _attributes);
+  get(primitiveDocument, "indices", _indices);
+  get(primitiveDocument, "material", _material);
+  get(primitiveDocument, "mode", _mode, GLenum(GL_TRIANGLES));
+  get(primitiveDocument, "targets", _targets);
+}
+
+gltf::Primitive::Primitive(const std::map<std::string, size_t> & attributes,
+                           const std::optional<size_t> & indices,
+                           const std::optional<size_t> & material,
+                           GLenum mode,
+                           const std::vector<std::map<std::string, size_t> > & targets):
+  _attributes(attributes),
+  _indices(indices),
+  _material(material),
+  _mode(mode),
+  _targets(targets)
+{
+}
+
+bool gltf::Primitive::operator==(const Primitive & other) const
+{
+  return
+    _attributes == other._attributes &&
+    _indices == other._indices &&
+    _material == other._material &&
+    _mode == other._mode &&
+    _targets == other._targets;
+}
+
+std::ostream & gltf::operator<<(std::ostream & str, const Primitive & primitive)
+{
+  str << "<"
+      << primitive._attributes << ", "
+      << primitive._indices << ", "
+      << primitive._material << ", "
+      << primitive._mode << ", "
+      << primitive._targets
+      << ">";
+  return str;
+}
+
+////////////////////
+// Mesh
+////////////////////
+
+gltf::Mesh::Mesh(const Json::Value & meshDocument)
+{
+  const Json::Value * primitivesDoc = getNode(meshDocument, "primitives");
+  if(primitivesDoc)
+  {
+    for(auto && primitiveDoc : *primitivesDoc)
+    {
+      _primitives.push_back(Primitive(primitiveDoc));
+    }
+  }  
+  get(meshDocument, "weights", _weights);
+  get(meshDocument, "name", _name);
+}
+
+gltf::Mesh::Mesh(const std::vector<Primitive> & primitives,
+                 const std::vector<size_t> & weights,
+                 const std::optional<std::string> & name):
+  _primitives(primitives),
+  _weights(weights),
+  _name(name)
+{
+}
+
+bool gltf::Mesh::operator==(const Mesh & other) const
+{
+  return
+    _primitives == other._primitives &&
+    _weights == other._weights &&
+    _name == other._name;
+}
+
+std::ostream & gltf::operator<<(std::ostream & str, const Mesh & mesh)
+{
+  str << "<"
+      << mesh._primitives << ", "
+      << mesh._weights << ", "
+      << mesh._name
+      << ">";
+  return str;
+}
+
+////////////////////
+// Asset
+////////////////////
+
 gltf::Asset::Asset(const std::string & gltfFile)
 {
   std::filesystem::path modelPath = std::filesystem::path(gltfFile).parent_path();
@@ -198,6 +319,16 @@ gltf::Asset::Asset(const std::string & gltfFile)
     for(auto && nodeDoc : *nodesDoc)
     {
       _nodes.push_back(Node(nodeDoc));
+    }
+  }
+
+  // Meshes
+  const Json::Value * meshesDoc = getNode(document, "meshes");
+  if(meshesDoc)
+  {
+    for(auto && meshDoc : *meshesDoc)
+    {
+      _meshes.push_back(Mesh(meshDoc));
     }
   }
 }

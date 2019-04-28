@@ -17,6 +17,18 @@ void gltf::detail::parse(const std::string & label,
 
 void gltf::detail::parse(const std::string & label,
                          const Json::Value * node,
+                         unsigned int & value)
+{
+  assert(node);
+  
+  if(!node->isConvertibleTo(Json::ValueType::uintValue))
+    throw std::runtime_error("Node " + label + " cannot be converted to unsigned integer");
+  
+  value = node->asUInt();
+}
+
+void gltf::detail::parse(const std::string & label,
+                         const Json::Value * node,
                          std::string & value)
 {
   assert(node);

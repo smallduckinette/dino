@@ -9,6 +9,7 @@
 #include <json/json.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <GL/glew.h>
 
 
 namespace gltf
@@ -31,7 +32,6 @@ namespace gltf
   class Node
   {
   public:
-    Node() {}
     Node(const Json::Value & nodeDocument);
     Node(const std::optional<size_t> & camera,
          const std::vector<size_t> & children,
@@ -59,6 +59,45 @@ namespace gltf
   };
 
   std::ostream & operator<<(std::ostream & str, const Node & node);
+
+  class Primitive
+  {
+  public:
+    Primitive(const Json::Value & primitiveDocument);
+    Primitive(const std::map<std::string, size_t> & attributes,
+              const std::optional<size_t> & indices,
+              const std::optional<size_t> & material,
+              GLenum mode,
+              const std::vector<std::map<std::string, size_t> > & targets);
+    
+    std::map<std::string, size_t> _attributes;
+    std::optional<size_t> _indices;
+    std::optional<size_t> _material;
+    GLenum _mode;
+    std::vector<std::map<std::string, size_t> > _targets;
+    
+    bool operator==(const Primitive & other) const;
+  };
+
+  std::ostream & operator<<(std::ostream & str, const Primitive & primitive);
+  
+  class Mesh
+  {
+  public:
+    Mesh(const Json::Value & meshDocument);
+    Mesh(const std::vector<Primitive> & primitives,
+         const std::vector<size_t> & weights,
+         const std::optional<std::string> & name);
+    
+    
+    std::vector<Primitive> _primitives;
+    std::vector<size_t> _weights;
+    std::optional<std::string> _name;
+
+    bool operator==(const Mesh & other) const;
+  };
+  
+  std::ostream & operator<<(std::ostream & str, const Mesh & mesh);
   
   class Asset
   {
@@ -68,6 +107,7 @@ namespace gltf
     size_t _scene;
     std::vector<Scene> _scenes;
     std::vector<Node> _nodes;
+    std::vector<Mesh> _meshes;
   };
 }
 

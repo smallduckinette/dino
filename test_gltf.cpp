@@ -51,6 +51,18 @@ BOOST_AUTO_TEST_CASE(testLoadSimpleAsset)
     
     BOOST_TEST(expected == asset._nodes, boost::test_tools::per_element());
   }
+
+  // Meshes
+  {
+    std::vector<gltf::Mesh> expected{
+      {
+        gltf::Mesh({{gltf::Primitive({{"NORMAL", 1}, {"POSITION", 0}, {"TEXCOORD_0", 2}}, {3}, {0}, GL_TRIANGLES, {})}},
+                   {},
+                   "Torus")
+          }};
+    
+    BOOST_TEST(expected == asset._meshes, boost::test_tools::per_element());
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
