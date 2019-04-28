@@ -3,18 +3,6 @@
 #include <iostream>
 #include "gltf/asset.h"
 
-namespace std
-{
-  template<typename T>
-  ostream & operator<<(ostream & str, const optional<T> & opt)
-  {
-    str << "{";
-    if(opt)
-      str << *opt;
-    str << "}";
-    return str;
-  }
-}
 
 BOOST_AUTO_TEST_SUITE(Gltf)
 
@@ -29,10 +17,39 @@ BOOST_AUTO_TEST_CASE(testLoadSimpleAsset)
   
   // Scenes
   {
-    BOOST_TEST(1 == asset._scenes.size());
-    BOOST_CHECK_EQUAL("Scene", asset._scenes.at(0)._name);
-    std::vector<size_t> expectedNodes{0, 1, 2};
-    BOOST_TEST(expectedNodes == asset._scenes.at(0)._nodes, boost::test_tools::per_element());
+    std::vector<gltf::Scene> expected{
+      {
+        gltf::Scene("Scene", {0, 1, 2})
+          }};
+    
+    BOOST_TEST(expected == asset._scenes, boost::test_tools::per_element());
+  }
+  
+  // Nodes
+  {
+    std::vector<gltf::Node> expected{
+      {
+        gltf::Node({}, {}, {}, {}, {},
+                   glm::quat(0.570, 0.169, 0.755, -0.272),
+                   {},
+                   glm::vec3(4.076, 5.903, -1.005),
+                   {},
+                   "Light"),
+          gltf::Node({}, {}, {}, {}, {},
+                     glm::quat(0.780, 0.483, 0.336, -0.208),
+                     {},
+                     glm::vec3(7.358, 4.95, 6.925),
+                     {},
+                     "Camera"),
+          gltf::Node({}, {}, {}, {}, {0},
+                     {},
+                     {},
+                     {},
+                     {},
+                     "Torus")
+          }};
+    
+    BOOST_TEST(expected == asset._nodes, boost::test_tools::per_element());
   }
 }
 
