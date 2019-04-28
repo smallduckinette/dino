@@ -14,8 +14,8 @@ namespace adh { class Shader; }
 namespace gltf
 {
   class Accessor;
-  class BufferView;
-  class Buffer;
+  class OldBufferView;
+  class OldBuffer;
   
   class NodeCache
   {
@@ -29,8 +29,8 @@ namespace gltf
     
     std::shared_ptr<adh::Node> getMesh(size_t index);
     std::shared_ptr<Accessor> getAccessor(size_t index);
-    std::shared_ptr<BufferView> getBufferView(size_t index);
-    std::shared_ptr<Buffer> getBuffer(size_t index);
+    std::shared_ptr<OldBufferView> getBufferView(size_t index);
+    std::shared_ptr<OldBuffer> getBuffer(size_t index);
     std::shared_ptr<adh::Texture> getTexture(size_t index);
     std::shared_ptr<adh::Material> getMaterial(size_t index);
     
@@ -42,8 +42,8 @@ namespace gltf
     std::map<size_t, std::shared_ptr<adh::Node> > _meshCache;
     
     std::map<size_t, std::shared_ptr<gltf::Accessor> > _accessorCache;
-    std::map<size_t, std::shared_ptr<gltf::BufferView> > _bufferViewCache;
-    std::map<size_t, std::shared_ptr<gltf::Buffer> > _bufferCache;
+    std::map<size_t, std::shared_ptr<gltf::OldBufferView> > _bufferViewCache;
+    std::map<size_t, std::shared_ptr<gltf::OldBuffer> > _bufferCache;
     std::map<size_t, std::shared_ptr<adh::Texture> > _textureCache;
     std::map<size_t, std::shared_ptr<adh::Material> > _materialCache;
     std::map<std::pair<std::string, std::vector<std::string> >, std::shared_ptr<adh::Shader> > _shaderCache;

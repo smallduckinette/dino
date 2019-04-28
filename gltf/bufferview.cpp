@@ -3,8 +3,8 @@
 #include "nodecache.h"
 #include "buffer.h"
 
-gltf::BufferView::BufferView(const Json::Value & doc,
-                             NodeCache & nodeCache)
+gltf::OldBufferView::OldBufferView(const Json::Value & doc,
+                                   NodeCache & nodeCache)
 {
   size_t bufferIndex = doc.get("buffer", -1).asUInt();
   _buffer = nodeCache.getBuffer(bufferIndex);
@@ -13,12 +13,12 @@ gltf::BufferView::BufferView(const Json::Value & doc,
   _offset = doc.get("byteOffset", 0).asUInt();
 }
 
-const char * gltf::BufferView::getData() const
+const char * gltf::OldBufferView::getData() const
 {
   return _buffer->getData() + _offset;
 }
 
-size_t gltf::BufferView::getSize() const
+size_t gltf::OldBufferView::getSize() const
 {
   return _length;
 }

@@ -7,13 +7,13 @@
 namespace gltf
 {
   class NodeCache;
-  class Buffer;
+  class OldBuffer;
   
-  class BufferView
+  class OldBufferView
   {
   public:
-    BufferView(const Json::Value & doc,
-               NodeCache & nodeCache);
+    OldBufferView(const Json::Value & doc,
+                  NodeCache & nodeCache);
       
     const char * getData() const;
     size_t getSize() const;
@@ -21,7 +21,7 @@ namespace gltf
   private:
     size_t _length;
     size_t _offset;
-    std::shared_ptr<Buffer> _buffer;
+    std::shared_ptr<OldBuffer> _buffer;
   };  
 }
 

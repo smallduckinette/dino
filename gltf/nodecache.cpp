@@ -214,7 +214,7 @@ std::shared_ptr<gltf::Accessor> gltf::NodeCache::getAccessor(size_t index)
   }  
 }
 
-std::shared_ptr<gltf::BufferView> gltf::NodeCache::getBufferView(size_t index)
+std::shared_ptr<gltf::OldBufferView> gltf::NodeCache::getBufferView(size_t index)
 {
   auto it = _bufferViewCache.find(index);
   if(it != _bufferViewCache.end())
@@ -225,11 +225,11 @@ std::shared_ptr<gltf::BufferView> gltf::NodeCache::getBufferView(size_t index)
   {
     auto && bufferViewDoc = _document["bufferViews"][Json::ArrayIndex(index)];
     
-    return _bufferViewCache.insert({index, std::make_shared<BufferView>(bufferViewDoc, *this)}).first->second;
+    return _bufferViewCache.insert({index, std::make_shared<OldBufferView>(bufferViewDoc, *this)}).first->second;
   }    
 }
 
-std::shared_ptr<gltf::Buffer> gltf::NodeCache::getBuffer(size_t index)
+std::shared_ptr<gltf::OldBuffer> gltf::NodeCache::getBuffer(size_t index)
 {
   auto it = _bufferCache.find(index);
   if(it != _bufferCache.end())
@@ -240,8 +240,8 @@ std::shared_ptr<gltf::Buffer> gltf::NodeCache::getBuffer(size_t index)
   {
     auto && bufferDoc = _document["buffers"][Json::ArrayIndex(index)];
     
-    return _bufferCache.insert({index, std::make_shared<Buffer>(_modelPath,
-                                                                bufferDoc)}).first->second;
+    return _bufferCache.insert({index, std::make_shared<OldBuffer>(_modelPath,
+                                                                   bufferDoc)}).first->second;
   }    
 }
 

@@ -6,11 +6,11 @@
 
 namespace gltf
 {
-  class Buffer
+  class OldBuffer
   {
   public:
-    Buffer(const std::filesystem::path & modelPath,
-           const Json::Value & doc);
+    OldBuffer(const std::filesystem::path & modelPath,
+              const Json::Value & doc);
     
     const char * getData() const;
     size_t getSize() const;

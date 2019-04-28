@@ -7,8 +7,8 @@
 #include "base64.h"
 
 
-gltf::Buffer::Buffer(const std::filesystem::path & modelPath,
-                     const Json::Value & doc)
+gltf::OldBuffer::OldBuffer(const std::filesystem::path & modelPath,
+                           const Json::Value & doc)
 {
   size_t length = doc.get("byteLength", 0).asUInt();
   std::string uri = doc.get("uri", "").asString();
@@ -30,12 +30,12 @@ gltf::Buffer::Buffer(const std::filesystem::path & modelPath,
     throw std::runtime_error("Inconsistent buffer size");
 }
 
-const char * gltf::Buffer::getData() const
+const char * gltf::OldBuffer::getData() const
 {
   return _data.data();
 }
 
-size_t gltf::Buffer::getSize() const
+size_t gltf::OldBuffer::getSize() const
 {
   return _data.size();
 }

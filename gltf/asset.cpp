@@ -1,10 +1,14 @@
 #include "asset.h"
 
 #include <fstream>
+#include <iterator>
+#include <boost/algorithm/string/predicate.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
+#undef GLM_ENABLE_EXPERIMENTAL
 
+#include "base64.h"
 #include "json_utils.h"
 
 namespace glm
@@ -289,6 +293,95 @@ std::ostream & gltf::operator<<(std::ostream & str, const Mesh & mesh)
 }
 
 ////////////////////
+// Buffer
+////////////////////
+gltf::Buffer::Buffer(const Json::Value & bufferDocument,
+                     const std::filesystem::path & modelPath)
+{
+  get(bufferDocument, "name", _name);
+  
+  size_t byteLength;
+  std::optional<std::string> uri;
+  
+  get(bufferDocument, "byteLength", byteLength);
+  get(bufferDocument, "uri", uri);
+  
+  if(!uri)
+    _data.resize(byteLength);
+  else
+  {
+    std::string inlineHeader("data:application/octet-stream;base64,");
+    if(boost::algorithm::starts_with(*uri, inlineHeader))
+    {
+      _data = base64_decode(uri->begin() + inlineHeader.size(), uri->end());
+    }
+    else
+    {
+      std::ifstream file(modelPath / *uri);
+      std::copy(std::istreambuf_iterator<char>(file),
+                std::istreambuf_iterator<char>(),
+                std::back_inserter(_data));
+    }
+    
+    if(_data.size() != byteLength)
+      throw std::runtime_error("Inconsistent buffer size");
+  }
+}
+
+////////////////////
+// BufferView
+////////////////////
+
+gltf::BufferView::BufferView(const Json::Value & bufferViewDocument)
+{
+  get(bufferViewDocument, "buffer", _buffer);
+  get(bufferViewDocument, "byteOffset", _byteOffset, size_t(0));
+  get(bufferViewDocument, "byteLength", _byteLength);
+  get(bufferViewDocument, "byteStride", _byteStride, size_t(0));
+  get(bufferViewDocument, "target", _target);
+  get(bufferViewDocument, "name", _name);
+}
+
+gltf::BufferView::BufferView(size_t buffer,
+                             size_t byteOffset,
+                             size_t byteLength,
+                             size_t byteStride,
+                             const std::optional<GLenum> & target,
+                             const std::optional<std::string> & name):
+  _buffer(buffer),
+  _byteOffset(byteOffset),
+  _byteLength(byteLength),
+  _byteStride(byteStride),
+  _target(target),
+  _name(name)
+{
+}
+
+bool gltf::BufferView::operator==(const BufferView & other) const
+{
+  return
+    _buffer == other._buffer &&
+    _byteOffset == other._byteOffset &&
+    _byteLength == other._byteLength &&
+    _byteStride == other._byteStride &&
+    _target == other._target &&
+    _name == other._name;
+}
+
+std::ostream & gltf::operator<<(std::ostream & str, const BufferView & bufferView)
+{
+  str << "<"
+      << bufferView._buffer << ", "
+      << bufferView._byteOffset << ", "
+      << bufferView._byteLength << ", "
+      << bufferView._byteStride << ", "
+      << bufferView._target << ", "
+      << bufferView._name
+      << ">";
+  return str;
+}
+
+////////////////////
 // Asset
 ////////////////////
 
@@ -329,6 +422,26 @@ gltf::Asset::Asset(const std::string & gltfFile)
     for(auto && meshDoc : *meshesDoc)
     {
       _meshes.push_back(Mesh(meshDoc));
+    }
+  }
+
+  // Buffers
+  const Json::Value * buffersDoc = getNode(document, "buffers");
+  if(buffersDoc)
+  {
+    for(auto && bufferDoc : *buffersDoc)
+    {
+      _buffers.push_back(Buffer(bufferDoc, modelPath));
+    }
+  }
+  
+  // BufferViews
+  const Json::Value * bufferViewsDoc = getNode(document, "bufferViews");
+  if(bufferViewsDoc)
+  {
+    for(auto && bufferViewDoc : *bufferViewsDoc)
+    {
+      _bufferViews.push_back(BufferView(bufferViewDoc));
     }
   }
 }

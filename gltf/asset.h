@@ -99,6 +99,39 @@ namespace gltf
   
   std::ostream & operator<<(std::ostream & str, const Mesh & mesh);
   
+  class Buffer
+  {
+  public:
+    Buffer(const Json::Value & sceneDocument,
+           const std::filesystem::path & modelPath);
+    
+    std::string _data;
+    std::optional<std::string> _name;
+  };
+
+  class BufferView
+  {
+  public:
+    BufferView(const Json::Value & bufferViewDocument);
+    BufferView(size_t buffer,
+               size_t byteOffset,
+               size_t byteLength,
+               size_t byteStride,
+               const std::optional<GLenum> & target,
+               const std::optional<std::string> & name);
+
+    size_t _buffer;
+    size_t _byteOffset;
+    size_t _byteLength;
+    size_t _byteStride;
+    std::optional<GLenum> _target;
+    std::optional<std::string> _name;
+
+    bool operator==(const BufferView & other) const;
+  };
+
+  std::ostream & operator<<(std::ostream & str, const BufferView & bufferView);
+  
   class Asset
   {
   public:
@@ -108,6 +141,8 @@ namespace gltf
     std::vector<Scene> _scenes;
     std::vector<Node> _nodes;
     std::vector<Mesh> _meshes;
+    std::vector<Buffer> _buffers;
+    std::vector<BufferView> _bufferViews;
   };
 }
 

@@ -9,7 +9,7 @@
 namespace gltf
 {
   class NodeCache;
-  class BufferView;
+  class OldBufferView;
   
   class Accessor
   {
@@ -38,7 +38,7 @@ namespace gltf
     }
     
   private:
-    std::shared_ptr<BufferView> _bufferView;
+    std::shared_ptr<OldBufferView> _bufferView;
     GLenum _componentType;
     size_t _count;
     size_t _typeSize;

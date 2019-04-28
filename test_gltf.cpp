@@ -63,6 +63,24 @@ BOOST_AUTO_TEST_CASE(testLoadSimpleAsset)
     
     BOOST_TEST(expected == asset._meshes, boost::test_tools::per_element());
   }
+
+  // Buffers
+  {
+    BOOST_TEST(1 == asset._buffers.size());
+  }
+  
+  // Buffer views
+  {
+    std::vector<gltf::BufferView> expected{
+      {
+        gltf::BufferView(0, 0, 7644, 0, {}, {}),
+        gltf::BufferView(0, 7644, 7644, 0, {}, {}),
+        gltf::BufferView(0, 15288, 5096, 0, {}, {}),
+        gltf::BufferView(0, 20384, 6912, 0, {}, {})
+          }};
+    
+    BOOST_TEST(expected == asset._bufferViews, boost::test_tools::per_element());
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
