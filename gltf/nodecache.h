@@ -13,7 +13,7 @@ namespace adh { class Shader; }
 
 namespace gltf
 {
-  class Accessor;
+  class OldAccessor;
   class OldBufferView;
   class OldBuffer;
   
@@ -28,7 +28,7 @@ namespace gltf
     std::shared_ptr<adh::Node> getScene();
     
     std::shared_ptr<adh::Node> getMesh(size_t index);
-    std::shared_ptr<Accessor> getAccessor(size_t index);
+    std::shared_ptr<OldAccessor> getAccessor(size_t index);
     std::shared_ptr<OldBufferView> getBufferView(size_t index);
     std::shared_ptr<OldBuffer> getBuffer(size_t index);
     std::shared_ptr<adh::Texture> getTexture(size_t index);
@@ -41,7 +41,7 @@ namespace gltf
     
     std::map<size_t, std::shared_ptr<adh::Node> > _meshCache;
     
-    std::map<size_t, std::shared_ptr<gltf::Accessor> > _accessorCache;
+    std::map<size_t, std::shared_ptr<gltf::OldAccessor> > _accessorCache;
     std::map<size_t, std::shared_ptr<gltf::OldBufferView> > _bufferViewCache;
     std::map<size_t, std::shared_ptr<gltf::OldBuffer> > _bufferCache;
     std::map<size_t, std::shared_ptr<adh::Texture> > _textureCache;

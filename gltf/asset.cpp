@@ -382,6 +382,117 @@ std::ostream & gltf::operator<<(std::ostream & str, const BufferView & bufferVie
 }
 
 ////////////////////
+// Sparse
+////////////////////
+gltf::Sparse::Sparse(const Json::Value & sparseDocument)
+{
+  get(sparseDocument, "count", _count);
+  get(sparseDocument, "indices", _indices);
+  get(sparseDocument, "values", _values);
+}
+
+gltf::Sparse::Sparse(size_t count,
+                     const std::map<std::string, size_t> & indices,
+                     const std::map<std::string, size_t> & values):
+  _count(count),
+  _indices(indices),
+  _values(values)
+{
+}
+
+bool gltf::Sparse::operator==(const Sparse & other) const
+{
+  return
+    _count == other._count && 
+    _indices == other._indices && 
+    _values == other._values;
+}
+
+std::ostream & gltf::operator<<(std::ostream & str, const Sparse & sparse)
+{
+  str << "<"
+      << sparse._count << ", "
+      << sparse._indices << ", "
+      << sparse._values
+      << ">";
+  return str;
+}
+
+////////////////////
+// Accessor
+////////////////////
+gltf::Accessor::Accessor(const Json::Value & accessorDocument)
+{
+  get(accessorDocument, "bufferView", _bufferView);
+  get(accessorDocument, "byteOffset", _byteOffset, size_t(0));
+  get(accessorDocument, "componentType", _componentType);
+  get(accessorDocument, "normalized", _normalized, false);
+  get(accessorDocument, "count", _count);
+  get(accessorDocument, "type", _type);
+  get(accessorDocument, "max", _max);
+  get(accessorDocument, "min", _min);
+  const Json::Value * sparse = getNode(accessorDocument, "sparse");
+  if(sparse)
+    _sparse = Sparse(sparse);
+  get(accessorDocument, "name", _name);
+}
+
+gltf::Accessor::Accessor(const std::optional<size_t> & bufferView,
+                         size_t byteOffset,
+                         GLenum componentType,
+                         bool normalized,
+                         size_t count,
+                         const std::string & type,
+                         const std::vector<float> & max,
+                         const std::vector<float> & min,
+                         const std::optional<Sparse> & sparse,
+                         const std::optional<std::string> & name):
+  _bufferView(bufferView),
+  _byteOffset(byteOffset),
+  _componentType(componentType),
+  _normalized(normalized),
+  _count(count),
+  _type(type),
+  _max(max),
+  _min(min),
+  _sparse(sparse),
+  _name(name)
+{
+}
+
+bool gltf::Accessor::operator==(const Accessor & other) const
+{
+  return
+    _bufferView == other._bufferView &&
+    _byteOffset == other._byteOffset &&
+    _componentType == other._componentType &&
+    _normalized == other._normalized &&
+    _count == other._count &&
+    _type == other._type &&
+    _max == other._max &&
+    _min == other._min &&
+    _sparse == other._sparse &&
+    _name == other._name;
+}
+
+std::ostream & gltf::operator<<(std::ostream & str, const Accessor & accessor)
+{
+  str << "<"
+      << accessor._bufferView << ", "
+      << accessor._byteOffset << ", "
+      << accessor._componentType << ", "
+      << accessor._normalized << ", "
+      << accessor._count << ", "
+      << accessor._type << ", "
+      << accessor._max << ", "
+      << accessor._min << ", "
+      << accessor._sparse << ", "
+      << accessor._name
+      << ">";
+  return str;
+}
+
+////////////////////
 // Asset
 ////////////////////
 
@@ -444,4 +555,14 @@ gltf::Asset::Asset(const std::string & gltfFile)
       _bufferViews.push_back(BufferView(bufferViewDoc));
     }
   }
+
+  // Accessors
+  const Json::Value * accessorsDoc = getNode(document, "accessors");
+  if(accessorsDoc)
+  {
+    for(auto && accessorDoc : *accessorsDoc)
+    {
+      _accessors.push_back(Accessor(accessorDoc));
+    }
+  }  
 }

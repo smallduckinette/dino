@@ -11,10 +11,10 @@ namespace gltf
   class NodeCache;
   class OldBufferView;
   
-  class Accessor
+  class OldAccessor
   {
   public:
-    Accessor(const Json::Value & doc,
+    OldAccessor(const Json::Value & doc,
              NodeCache & nodeCache);
     
     const char * getData() const;
@@ -44,7 +44,7 @@ namespace gltf
     size_t _typeSize;
   };
 
-  std::ostream & operator<<(std::ostream & str, const Accessor & accessor);
+  std::ostream & operator<<(std::ostream & str, const OldAccessor & accessor);
 }
 
 #endif

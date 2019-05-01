@@ -91,7 +91,7 @@ std::shared_ptr<adh::Node> gltf::NodeCache::getMesh(size_t index)
 
 std::shared_ptr<adh::Node> gltf::NodeCache::getPrimitive(const Json::Value & primitiveDoc)
 {
-  std::vector<std::shared_ptr<Accessor> > selectedAccessors;
+  std::vector<std::shared_ptr<OldAccessor> > selectedAccessors;
   selectedAccessors.push_back(getAccessor(primitiveDoc["attributes"].get("POSITION", "").asUInt()));
   selectedAccessors.push_back(getAccessor(primitiveDoc["attributes"].get("NORMAL", "").asUInt()));
   selectedAccessors.push_back(getAccessor(primitiveDoc["attributes"].get("TEXCOORD_0", "").asUInt()));
@@ -199,7 +199,7 @@ std::shared_ptr<adh::Shader> gltf::NodeCache::getShader(const std::string & shad
   }
 }
 
-std::shared_ptr<gltf::Accessor> gltf::NodeCache::getAccessor(size_t index)
+std::shared_ptr<gltf::OldAccessor> gltf::NodeCache::getAccessor(size_t index)
 {
   auto it = _accessorCache.find(index);
   if(it != _accessorCache.end())
@@ -210,7 +210,7 @@ std::shared_ptr<gltf::Accessor> gltf::NodeCache::getAccessor(size_t index)
   {
     auto && accessorDoc = _document["accessors"][Json::ArrayIndex(index)];
     
-    return _accessorCache.insert({index, std::make_shared<Accessor>(accessorDoc, *this)}).first->second;
+    return _accessorCache.insert({index, std::make_shared<OldAccessor>(accessorDoc, *this)}).first->second;
   }  
 }
 

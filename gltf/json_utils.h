@@ -26,6 +26,10 @@ namespace gltf
     void parse(const std::string & label,
                const Json::Value * node,
                float & value);
+
+    void parse(const std::string & label,
+               const Json::Value * node,
+               bool & value);
   }
   
   const Json::Value * getNode(const Json::Value & document,

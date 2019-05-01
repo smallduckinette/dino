@@ -129,8 +129,56 @@ namespace gltf
 
     bool operator==(const BufferView & other) const;
   };
-
+  
   std::ostream & operator<<(std::ostream & str, const BufferView & bufferView);
+  
+  class Sparse
+  {
+  public:
+    Sparse(const Json::Value & sparseDocument);
+    Sparse(size_t count,
+           const std::map<std::string, size_t> & indices,
+           const std::map<std::string, size_t> & values);
+           
+    size_t _count;
+    std::map<std::string, size_t> _indices;
+    std::map<std::string, size_t> _values;
+    
+    bool operator==(const Sparse & other) const;
+  };
+  
+  std::ostream & operator<<(std::ostream & str, const Sparse & sparse);
+  
+  class Accessor
+  {
+  public:
+    Accessor(const Json::Value & accessorDocument);
+    Accessor(const std::optional<size_t> & bufferView,
+             size_t byteOffset,
+             GLenum componentType,
+             bool normalized,
+             size_t count,
+             const std::string & type,
+             const std::vector<float> & max,
+             const std::vector<float> & min,
+             const std::optional<Sparse> & sparse,
+             const std::optional<std::string> & name);
+    
+    std::optional<size_t> _bufferView;
+    size_t _byteOffset;
+    GLenum _componentType;
+    bool _normalized;
+    size_t _count;
+    std::string _type;
+    std::vector<float> _max;
+    std::vector<float> _min;
+    std::optional<Sparse> _sparse;
+    std::optional<std::string> _name;
+    
+    bool operator==(const Accessor & other) const;
+  };
+  
+  std::ostream & operator<<(std::ostream & str, const Accessor & accessor);
   
   class Asset
   {
@@ -143,6 +191,7 @@ namespace gltf
     std::vector<Mesh> _meshes;
     std::vector<Buffer> _buffers;
     std::vector<BufferView> _bufferViews;
+    std::vector<Accessor> _accessors;
   };
 }
 

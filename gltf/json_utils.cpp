@@ -51,6 +51,18 @@ void gltf::detail::parse(const std::string & label,
   value = node->asDouble(); 
 }
 
+void gltf::detail::parse(const std::string & label,
+                         const Json::Value * node,
+                         bool & value)
+{
+  assert(node);
+
+  if(!node->isConvertibleTo(Json::ValueType::booleanValue))
+    throw std::runtime_error("Node " + label + " cannot be converted to boolean");
+  
+  value = node->asBool();   
+}
+
 const Json::Value * gltf::getNode(const Json::Value & document,
                                   const std::string & name)
 {

@@ -4,7 +4,7 @@
 #include "bufferview.h"
 
 
-gltf::Accessor::Accessor(const Json::Value & doc,
+gltf::OldAccessor::OldAccessor(const Json::Value & doc,
                          NodeCache & nodeCache)
 {
   size_t viewIndex = doc.get("bufferView", -1).asUInt();
@@ -27,22 +27,22 @@ gltf::Accessor::Accessor(const Json::Value & doc,
 }
 
 
-const char * gltf::Accessor::getData() const
+const char * gltf::OldAccessor::getData() const
 {
   return _bufferView->getData();
 }
 
-size_t gltf::Accessor::getCount() const
+size_t gltf::OldAccessor::getCount() const
 {
   return _count;
 }
 
-GLenum gltf::Accessor::getComponentType() const
+GLenum gltf::OldAccessor::getComponentType() const
 {
   return _componentType;
 }
 
-size_t gltf::Accessor::getComponentSize() const
+size_t gltf::OldAccessor::getComponentSize() const
 {
   switch(_componentType)
   {
@@ -60,17 +60,17 @@ size_t gltf::Accessor::getComponentSize() const
   }
 }
 
-size_t gltf::Accessor::getTypeSize() const
+size_t gltf::OldAccessor::getTypeSize() const
 {
   return _typeSize;
 }
 
-size_t gltf::Accessor::getSize() const
+size_t gltf::OldAccessor::getSize() const
 {
   return getCount() * getComponentSize() * getTypeSize();
 }
 
-std::ostream & gltf::operator<<(std::ostream & str, const Accessor & accessor)
+std::ostream & gltf::operator<<(std::ostream & str, const OldAccessor & accessor)
 {
   switch(accessor.getComponentType())
   {

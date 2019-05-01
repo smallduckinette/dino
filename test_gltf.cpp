@@ -81,6 +81,18 @@ BOOST_AUTO_TEST_CASE(testLoadSimpleAsset)
     
     BOOST_TEST(expected == asset._bufferViews, boost::test_tools::per_element());
   }
+
+  // Accessors
+  {
+    std::vector<gltf::Accessor> expected{
+      gltf::Accessor(0, 0, GL_FLOAT, false, 637, "VEC3", {1.25, 0.25, 1.25}, {-1.25, -0.25, -1.25}, {}, {}),
+        gltf::Accessor(1, 0, GL_FLOAT, false, 637, "VEC3", {}, {}, {}, {}),
+        gltf::Accessor(2, 0, GL_FLOAT, false, 637, "VEC2", {}, {}, {}, {}),
+        gltf::Accessor(3, 0, GL_UNSIGNED_SHORT, false, 3456, "SCALAR", {}, {}, {}, {})
+        };
+    
+    BOOST_TEST(expected == asset._accessors, boost::test_tools::per_element());
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
