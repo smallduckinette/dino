@@ -493,6 +493,253 @@ std::ostream & gltf::operator<<(std::ostream & str, const Accessor & accessor)
 }
 
 ////////////////////
+// TextureInfo
+////////////////////
+
+gltf::TextureInfo::TextureInfo(const Json::Value & materialDocument)
+{
+  get(materialDocument, "index", _index);
+  get(materialDocument, "texCoord", _texCoord, size_t(0));
+}
+
+gltf::TextureInfo::TextureInfo(size_t index,
+                               size_t texCoord):
+  _index(index),
+  _texCoord(texCoord)
+{
+}
+
+bool gltf::TextureInfo::operator==(const TextureInfo & other) const
+{
+  return
+    _index == other._index &&
+    _texCoord == other._texCoord;
+}
+
+std::ostream & gltf::operator<<(std::ostream & str, const TextureInfo & textureInfo)
+{
+  str << "<"
+      << textureInfo._index << ", "
+      << textureInfo._texCoord << ", "
+      << ">";
+  return str;
+}
+
+////////////////////
+// NormalTextureInfo
+////////////////////
+
+gltf::NormalTextureInfo::NormalTextureInfo(const Json::Value & materialDocument)
+{
+  get(materialDocument, "index", _index);
+  get(materialDocument, "texCoord", _texCoord, size_t(0));
+  get(materialDocument, "scale", _scale, 1.0f);
+}
+
+gltf::NormalTextureInfo::NormalTextureInfo(size_t index,
+                                           size_t texCoord,
+                                           float scale):
+  _index(index),
+  _texCoord(texCoord),
+  _scale(scale)
+{
+}
+
+bool gltf::NormalTextureInfo::operator==(const NormalTextureInfo & other) const
+{
+  return
+    _index == other._index &&
+    _texCoord == other._texCoord &&
+    close(_scale, other._scale);
+}
+
+std::ostream & gltf::operator<<(std::ostream & str, const NormalTextureInfo & textureInfo)
+{
+  str << "<"
+      << textureInfo._index << ", "
+      << textureInfo._texCoord << ", "
+      << ">";
+  return str;
+}
+
+////////////////////
+// OcclusionTextureInfo
+////////////////////
+
+gltf::OcclusionTextureInfo::OcclusionTextureInfo(const Json::Value & materialDocument)
+{
+  get(materialDocument, "index", _index);
+  get(materialDocument, "texCoord", _texCoord, size_t(0));
+  get(materialDocument, "strength", _strength, 1.0f);
+}
+
+gltf::OcclusionTextureInfo::OcclusionTextureInfo(size_t index,
+                                                 size_t texCoord,
+                                                 float strength):
+  _index(index),
+  _texCoord(texCoord),
+  _strength(strength)
+{
+}
+
+bool gltf::OcclusionTextureInfo::operator==(const OcclusionTextureInfo & other) const
+{
+  return
+    _index == other._index &&
+    _texCoord == other._texCoord &&
+    close(_strength, other._strength);
+}
+
+std::ostream & gltf::operator<<(std::ostream & str, const OcclusionTextureInfo & textureInfo)
+{
+  str << "<"
+      << textureInfo._index << ", "
+      << textureInfo._texCoord << ", "
+      << ">";
+  return str;
+}
+
+////////////////////
+// PbrMetallicRoughness
+////////////////////
+
+gltf::PbrMetallicRoughness::PbrMetallicRoughness(const Json::Value & pbrDocument)
+{
+  get(pbrDocument, "baseColorFactor", _baseColorFactor, glm::vec4(1, 1, 1, 1));
+  const Json::Value * baseColorTexture = getNode(pbrDocument, "baseColorTexture");
+  if(baseColorTexture)
+  {
+    _baseColorTexture = TextureInfo(*baseColorTexture);
+  }
+  get(pbrDocument, "metallicFactor", _metallicFactor, 1.0f);
+  get(pbrDocument, "roughnessFactor", _roughnessFactor, 1.0f);
+  const Json::Value * metallicRoughnessTexture = getNode(pbrDocument, "metallicRoughnessTexture");
+  if(metallicRoughnessTexture)
+  {
+    _metallicRoughnessTexture = TextureInfo(*metallicRoughnessTexture);
+  }
+}
+
+gltf::PbrMetallicRoughness::PbrMetallicRoughness(const glm::vec4 & baseColorFactor,
+                                                 const std::optional<TextureInfo> & baseColorTexture,
+                                                 float metallicFactor,
+                                                 float roughnessFactor,
+                                                 const std::optional<TextureInfo> & metallicRoughnessTexture):
+  _baseColorFactor(baseColorFactor),
+  _baseColorTexture(baseColorTexture),
+  _metallicFactor(metallicFactor),
+  _roughnessFactor(roughnessFactor),
+  _metallicRoughnessTexture(metallicRoughnessTexture)
+{
+}
+
+bool gltf::PbrMetallicRoughness::operator==(const PbrMetallicRoughness & other) const
+{
+  return
+    close(_baseColorFactor, other._baseColorFactor) &&
+    _baseColorTexture == other._baseColorTexture &&
+    close(_metallicFactor, other._metallicFactor) &&
+    close(_roughnessFactor, other._roughnessFactor) &&
+    _metallicRoughnessTexture == other._metallicRoughnessTexture;
+}
+
+std::ostream & gltf::operator<<(std::ostream & str, const PbrMetallicRoughness & pbr)
+{
+  str << "<"
+      << pbr._baseColorFactor << ", "
+      << pbr._baseColorTexture << ", "
+      << pbr._metallicFactor << ", "
+      << pbr._roughnessFactor << ", "
+      << pbr._metallicRoughnessTexture
+      << ">";
+  return str;
+}
+
+////////////////////
+// Material
+////////////////////
+
+gltf::Material::Material(const Json::Value & materialDocument)
+{
+  get(materialDocument, "name", _name);
+  const Json::Value * pbr = getNode(materialDocument, "pbrMetallicRoughness");
+  if(pbr)
+  {
+    _pbrMetallicRoughness = PbrMetallicRoughness(*pbr);
+  }
+  const Json::Value * normal = getNode(materialDocument, "normalTexture");
+  if(normal)
+  {
+    _normalTexture = NormalTextureInfo(*normal);
+  }
+  const Json::Value * occlusion = getNode(materialDocument, "occlusionTexture");
+  if(occlusion)
+  {
+    _occlusionTexture = OcclusionTextureInfo(*occlusion);
+  }  
+  const Json::Value * emissive = getNode(materialDocument, "emissiveTexture");
+  if(emissive)
+  {
+    _emissiveTexture = TextureInfo(*emissive);
+  }
+  get(materialDocument, "emissiveFactor", _emissiveFactor, glm::vec3(0, 0, 0));
+  get(materialDocument, "alphaMode", _alphaMode, std::string("OPAQUE"));
+  get(materialDocument, "alphaCutoff", _alphaCutoff, 0.5f);
+  get(materialDocument, "doubleSided", _doubleSided, false);
+}
+
+gltf::Material::Material(const std::optional<std::string> & name,
+                         const std::optional<PbrMetallicRoughness> & pbrMetallicRoughness,
+                         const std::optional<NormalTextureInfo> & normalTexture,
+                         const std::optional<OcclusionTextureInfo> & occlusionTexture,
+                         const std::optional<TextureInfo> & emissiveTexture,
+                         const glm::vec3 & emissiveFactor,
+                         const std::string & alphaMode,
+                         float alphaCutoff,
+                         bool doubleSided):
+  _name(name),
+  _pbrMetallicRoughness(pbrMetallicRoughness),
+  _normalTexture(normalTexture),
+  _occlusionTexture(occlusionTexture),
+  _emissiveTexture(emissiveTexture),
+  _emissiveFactor(emissiveFactor),
+  _alphaMode(alphaMode),
+  _alphaCutoff(alphaCutoff),
+  _doubleSided(doubleSided)
+{
+}
+
+bool gltf::Material::operator==(const Material & other) const
+{
+  return
+    _name == other._name &&
+    _pbrMetallicRoughness == other._pbrMetallicRoughness &&
+    _normalTexture == other._normalTexture &&
+    _occlusionTexture == other._occlusionTexture &&
+    _emissiveTexture == other._emissiveTexture &&
+    close(_emissiveFactor, other._emissiveFactor) &&
+    _alphaMode == other._alphaMode &&
+    close(_alphaCutoff, other._alphaCutoff) &&
+    _doubleSided == other._doubleSided;
+}
+
+std::ostream & gltf::operator<<(std::ostream & str, const Material & material)
+{
+  str << "<"
+      << material._name << ", "
+      << material._pbrMetallicRoughness << ", "
+      << material._normalTexture << ", "
+      << material._occlusionTexture << ", "
+      << material._emissiveTexture << ", "
+      << material._emissiveFactor << ", "
+      << material._alphaMode  << ", "
+      << material._alphaCutoff << ", "
+      << material._doubleSided
+      << ">";
+  return str;
+}
+
+////////////////////
 // Asset
 ////////////////////
 

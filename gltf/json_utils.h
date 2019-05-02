@@ -46,6 +46,10 @@ namespace gltf
   void get(const Json::Value & document,
            const std::string & name,
            glm::vec3 & value);
+
+  void get(const Json::Value & document,
+           const std::string & name,
+           glm::vec4 & value);
   
   template<typename T>
   void get(const Json::Value & document,

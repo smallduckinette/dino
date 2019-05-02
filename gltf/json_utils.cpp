@@ -104,3 +104,15 @@ void gltf::get(const Json::Value & document,
   
   value = glm::make_vec3(&elts[0]);
 }
+
+void gltf::get(const Json::Value & document,
+               const std::string & name,
+               glm::vec4 & value)
+{
+  std::vector<float> elts;
+  get(document, name, elts);
+  if(elts.size() != 4)
+    throw std::runtime_error("Failed to parse vec4 " + name + " : bad number of elements");
+  
+  value = glm::make_vec4(&elts[0]);
+}

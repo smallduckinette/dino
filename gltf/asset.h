@@ -180,6 +180,106 @@ namespace gltf
   
   std::ostream & operator<<(std::ostream & str, const Accessor & accessor);
   
+  class TextureInfo
+  {
+  public:
+    TextureInfo(const Json::Value & materialDocument);
+    TextureInfo(size_t index,
+                size_t texCoord);
+    
+    size_t _index;
+    size_t _texCoord;
+
+    bool operator==(const TextureInfo & other) const;
+  };
+  
+  std::ostream & operator<<(std::ostream & str, const TextureInfo & textureInfo);
+  
+  class NormalTextureInfo
+  {
+  public:
+    NormalTextureInfo(const Json::Value & materialDocument);
+    NormalTextureInfo(size_t index,
+                      size_t texCoord,
+                      float scale);
+    
+    size_t _index;
+    size_t _texCoord;
+    float _scale;
+    
+    bool operator==(const NormalTextureInfo & other) const;
+  };
+  
+  std::ostream & operator<<(std::ostream & str, const NormalTextureInfo & textureInfo);
+  
+  class OcclusionTextureInfo
+  {
+  public:
+    OcclusionTextureInfo(const Json::Value & materialDocument);
+    OcclusionTextureInfo(size_t index,
+                      size_t texCoord,
+                      float scale);
+    
+    size_t _index;
+    size_t _texCoord;
+    float _strength;
+    
+    bool operator==(const OcclusionTextureInfo & other) const;
+  };
+  
+  std::ostream & operator<<(std::ostream & str, const OcclusionTextureInfo & textureInfo);
+  
+  class PbrMetallicRoughness
+  {
+  public:
+    PbrMetallicRoughness(const Json::Value & pbrDocument);
+    PbrMetallicRoughness(const glm::vec4 & baseColorFactor,
+                         const std::optional<TextureInfo> & baseColorTexture,
+                         float metallicFactor,
+                         float roughnessFactory,
+                         const std::optional<TextureInfo> & metallicRoughnessTexture);
+
+    
+    glm::vec4 _baseColorFactor;
+    std::optional<TextureInfo> _baseColorTexture;
+    float _metallicFactor;
+    float _roughnessFactor;
+    std::optional<TextureInfo> _metallicRoughnessTexture;
+
+    bool operator==(const PbrMetallicRoughness & other) const;
+  };
+  
+  std::ostream & operator<<(std::ostream & str, const PbrMetallicRoughness & pbr);
+  
+  class Material
+  {
+  public:
+    Material(const Json::Value & materialDocument);
+    Material(const std::optional<std::string> & name,
+             const std::optional<PbrMetallicRoughness> & pbrMetallicRoughness,
+             const std::optional<NormalTextureInfo> & normalTexture,
+             const std::optional<OcclusionTextureInfo> & occlusionTexture,
+             const std::optional<TextureInfo> & emissiveTexture,
+             const glm::vec3 & emissiveFactor,
+             const std::string & alphaMode,
+             float alphaCutoff,
+             bool doubleSided);
+    
+    std::optional<std::string> _name;
+    std::optional<PbrMetallicRoughness> _pbrMetallicRoughness;
+    std::optional<NormalTextureInfo> _normalTexture;
+    std::optional<OcclusionTextureInfo> _occlusionTexture;
+    std::optional<TextureInfo> _emissiveTexture;
+    glm::vec3 _emissiveFactor;
+    std::string _alphaMode;
+    float _alphaCutoff;
+    bool _doubleSided;
+
+    bool operator==(const Material & other) const;
+  };
+
+  std::ostream & operator<<(std::ostream & str, const Material & material);
+  
   class Asset
   {
   public:
