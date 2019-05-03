@@ -23,6 +23,11 @@ namespace glm
     return str << glm::to_string(v);
   }
 
+  std::ostream& operator<<(std::ostream & str, const glm::vec4 & v)
+  {
+    return str << glm::to_string(v);
+  }
+
   std::ostream& operator<<(std::ostream & str, const glm::quat & q)
   {
     return str << glm::to_string(q);
@@ -810,6 +815,16 @@ gltf::Asset::Asset(const std::string & gltfFile)
     for(auto && accessorDoc : *accessorsDoc)
     {
       _accessors.push_back(Accessor(accessorDoc));
+    }
+  }
+  
+  // Materials
+  const Json::Value * materialsDoc = getNode(document, "materials");
+  if(materialsDoc)
+  {
+    for(auto && materialDoc : *materialsDoc)
+    {
+      _materials.push_back(Material(materialDoc));
     }
   }  
 }

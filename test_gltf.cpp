@@ -93,6 +93,23 @@ BOOST_AUTO_TEST_CASE(testLoadSimpleAsset)
     
     BOOST_TEST(expected == asset._accessors, boost::test_tools::per_element());
   }
+
+  // Materials
+  {
+    std::vector<gltf::Material> expected{
+      gltf::Material("Material",
+                     gltf::PbrMetallicRoughness(glm::vec4(0.8, 0, 0.04, 1), {}, 0, 0.1, {}),
+                     {},
+                     {},
+                     {},
+                     glm::vec3(0, 0, 0),
+                     "OPAQUE",
+                     0.5,
+                     0)
+        };
+    
+    BOOST_TEST(expected == asset._materials, boost::test_tools::per_element());
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -292,6 +292,7 @@ namespace gltf
     std::vector<Buffer> _buffers;
     std::vector<BufferView> _bufferViews;
     std::vector<Accessor> _accessors;
+    std::vector<Material> _materials;
   };
 }
 
