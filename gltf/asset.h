@@ -279,6 +279,63 @@ namespace gltf
   };
 
   std::ostream & operator<<(std::ostream & str, const Material & material);
+
+  class Texture
+  {
+  public:
+    Texture(const Json::Value & textureDocument);
+    Texture(const std::optional<size_t> & sampler,
+            const std::optional<size_t> & source,
+            const std::optional<std::string> & name);
+    
+    std::optional<size_t> _sampler;
+    std::optional<size_t> _source;
+    std::optional<std::string> _name;
+
+    bool operator==(const Texture & other) const;
+  };
+  
+  std::ostream & operator<<(std::ostream & str, const Texture & texture);
+
+  class Sampler
+  {
+  public:
+    Sampler(const Json::Value & samplerDocument);
+    Sampler(const std::optional<GLenum> & magFilter,
+            const std::optional<GLenum> & minFilter,
+            GLenum wrapS,
+            GLenum wrapT,
+            const std::optional<std::string> & name);
+    
+    std::optional<GLenum> _magFilter;
+    std::optional<GLenum> _minFilter;
+    GLenum _wrapS;
+    GLenum _wrapT;
+    std::optional<std::string> _name;
+
+    bool operator==(const Sampler & other) const;
+  };
+  
+  std::ostream & operator<<(std::ostream & str, const Sampler & sampler);
+
+  class Image
+  {
+  public:
+    Image(const Json::Value & imageDocument);
+    Image(const std::optional<std::string> & uri,
+          const std::optional<std::string> & mimeType,
+          const std::optional<size_t> & bufferView,
+          const std::optional<std::string> & name);
+    
+    std::optional<std::string> _uri;
+    std::optional<std::string> _mimeType;
+    std::optional<size_t> _bufferView;
+    std::optional<std::string> _name;
+
+    bool operator==(const Image & other) const;
+  };
+
+  std::ostream & operator<<(std::ostream & str, const Image & image);
   
   class Asset
   {
@@ -293,6 +350,8 @@ namespace gltf
     std::vector<BufferView> _bufferViews;
     std::vector<Accessor> _accessors;
     std::vector<Material> _materials;
+    std::vector<Texture> _textures;
+    std::vector<Sampler> _samplers;
   };
 }
 

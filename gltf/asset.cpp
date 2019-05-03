@@ -745,6 +745,136 @@ std::ostream & gltf::operator<<(std::ostream & str, const Material & material)
 }
 
 ////////////////////
+// Texture
+////////////////////
+
+gltf::Texture::Texture(const Json::Value & textureDocument)
+{
+  get(textureDocument, "sampler", _sampler);
+  get(textureDocument, "source", _source);
+  get(textureDocument, "name", _name);
+}
+
+gltf::Texture::Texture(const std::optional<size_t> & sampler,
+                       const std::optional<size_t> & source,
+                       const std::optional<std::string> & name):
+  _sampler(sampler),
+  _source(source),
+  _name(name)
+{
+}
+
+bool gltf::Texture::operator==(const Texture & other) const
+{
+  return
+    _sampler == other._sampler &&
+    _source == other._source &&
+    _name == other._name;
+}
+
+std::ostream & gltf::operator<<(std::ostream & str, const Texture & texture)
+{
+  str << "<"
+      << texture._sampler << ", "
+      << texture._source << ", "
+      << texture._name
+      << ">";
+  return str;
+}
+
+////////////////////
+// Sampler
+////////////////////
+
+gltf::Sampler::Sampler(const Json::Value & samplerDocument)
+{
+  get(samplerDocument, "magFilter", _magFilter);
+  get(samplerDocument, "minFilter", _minFilter);
+  get(samplerDocument, "wrapS", _wrapS, GLenum(GL_REPEAT));
+  get(samplerDocument, "wrapT", _wrapT, GLenum(GL_REPEAT));
+  get(samplerDocument, "name", _name);
+}
+
+gltf::Sampler::Sampler(const std::optional<GLenum> & magFilter,
+                       const std::optional<GLenum> & minFilter,
+                       GLenum wrapS,
+                       GLenum wrapT,
+                       const std::optional<std::string> & name):
+  _magFilter(magFilter),
+  _minFilter(minFilter),
+  _wrapS(wrapS),
+  _wrapT(wrapT),
+  _name(name)
+{
+}
+
+bool gltf::Sampler::operator==(const Sampler & other) const
+{
+  return
+    _magFilter == other._magFilter &&
+    _minFilter == other._minFilter &&
+    _wrapS == other._wrapS &&
+    _wrapT == other._wrapT &&
+    _name == other._name;
+}
+
+std::ostream & gltf::operator<<(std::ostream & str, const Sampler & sampler)
+{
+  str << "<"
+      << sampler._magFilter << ", "
+      << sampler._minFilter << ", "
+      << sampler._wrapS << ", "
+      << sampler._wrapT << ", "
+      << sampler._name
+      << ">";
+  return str;
+}
+
+////////////////////
+// Image
+////////////////////
+
+
+gltf::Image::Image(const Json::Value & imageDocument)
+{
+  get(imageDocument, "uri", _uri);
+  get(imageDocument, "mimeType", _mimeType);
+  get(imageDocument, "bufferView", _bufferView);
+  get(imageDocument, "name", _name);
+}
+
+gltf::Image::Image(const std::optional<std::string> & uri,
+                   const std::optional<std::string> & mimeType,
+                   const std::optional<size_t> & bufferView,
+                   const std::optional<std::string> & name):
+  _uri(uri),
+  _mimeType(mimeType),
+  _bufferView(bufferView),
+  _name(name)
+{
+}
+
+bool gltf::Image::operator==(const Image & other) const
+{
+  return 
+    _uri == other._uri &&
+    _mimeType == other._mimeType &&
+    _bufferView == other._bufferView &&
+    _name == other._name;
+}
+
+std::ostream & gltf::operator<<(std::ostream & str, const Image & image)
+{
+  str << "<"
+      << image._uri << ", "
+      << image._mimeType << ", "
+      << image._bufferView << ", "
+      << image._name
+      << ">";
+  return str;
+}
+
+////////////////////
 // Asset
 ////////////////////
 
@@ -825,6 +955,26 @@ gltf::Asset::Asset(const std::string & gltfFile)
     for(auto && materialDoc : *materialsDoc)
     {
       _materials.push_back(Material(materialDoc));
+    }
+  }  
+  
+  // Textures
+  const Json::Value * texturesDoc = getNode(document, "textures");
+  if(texturesDoc)
+  {
+    for(auto && textureDoc : *texturesDoc)
+    {
+      _textures.push_back(Texture(textureDoc));
+    }
+  }  
+
+  // Samplers
+  const Json::Value * samplersDoc = getNode(document, "samplers");
+  if(samplersDoc)
+  {
+    for(auto && samplerDoc : *samplersDoc)
+    {
+      _samplers.push_back(Sampler(samplerDoc));
     }
   }  
 }
