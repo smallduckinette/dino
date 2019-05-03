@@ -977,4 +977,14 @@ gltf::Asset::Asset(const std::string & gltfFile)
       _samplers.push_back(Sampler(samplerDoc));
     }
   }  
+
+  // Images
+  const Json::Value * imagesDoc = getNode(document, "images");
+  if(imagesDoc)
+  {
+    for(auto && imageDoc : *imagesDoc)
+    {
+      _images.push_back(Image(imageDoc));
+    }
+  }  
 }

@@ -352,6 +352,7 @@ namespace gltf
     std::vector<Material> _materials;
     std::vector<Texture> _textures;
     std::vector<Sampler> _samplers;
+    std::vector<Image> _images;
   };
 }
 
