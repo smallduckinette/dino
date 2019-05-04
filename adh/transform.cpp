@@ -2,7 +2,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-adh::Transform::Transform():
+adh::Transform::Transform(const std::string & name):
+  Node(name),
   _matrix(1.0f),
   _translate(1.0f),
   _rotate(1.0f),

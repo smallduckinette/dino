@@ -11,7 +11,7 @@ namespace adh
   class Transform : public Node
   {
   public:
-    Transform();
+    Transform(const std::string & name = {});
     
     void draw(Context & context) const override;
     
