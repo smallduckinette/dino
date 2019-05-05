@@ -176,6 +176,8 @@ namespace gltf
     std::optional<std::string> _name;
     
     bool operator==(const Accessor & other) const;
+    
+    GLint getComponentCount() const;
   };
   
   std::ostream & operator<<(std::ostream & str, const Accessor & accessor);

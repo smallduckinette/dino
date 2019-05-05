@@ -480,6 +480,26 @@ bool gltf::Accessor::operator==(const Accessor & other) const
     _name == other._name;
 }
 
+GLint gltf::Accessor::getComponentCount() const
+{
+  if(_type == "SCALAR")
+    return 1;
+  else if(_type == "VEC2")
+    return 2;
+  else if(_type == "VEC3")
+    return 3;
+  else if(_type == "VEC4")
+    return 4;
+  else if(_type == "MAT2")
+    return 4;
+  else if(_type == "MAT3")
+    return 9;
+  else if(_type == "MAT4")
+    return 16;
+  else
+    throw std::runtime_error("Unknown component type " + _type);
+}
+
 std::ostream & gltf::operator<<(std::ostream & str, const Accessor & accessor)
 {
   str << "<"

@@ -145,7 +145,7 @@ std::shared_ptr<adh::Node> gltf::NodeCache::getPrimitive(const Json::Value & pri
     }
   }
   
-  auto primitive = std::make_shared<adh::Primitive>();
+  auto primitive = std::make_shared<adh::Primitive>(GL_TRIANGLES);
   primitive->bind();
   
   BOOST_LOG_TRIVIAL(debug) << "Copying " << data.size() << " bytes of data out of expected " << totalSize;
@@ -166,10 +166,10 @@ std::shared_ptr<adh::Node> gltf::NodeCache::getPrimitive(const Json::Value & pri
     
   BOOST_LOG_TRIVIAL(debug) << "Binding elements...";
   auto indicesAccessor = getAccessor(primitiveDoc.get("indices", "").asUInt());
-  primitive->setIndexData(indicesAccessor->getData(),
-                          indicesAccessor->getSize());
-  primitive->describeIndexData(indicesAccessor->getCount(),
-                               indicesAccessor->getComponentType());
+  //primitive->setIndexData(indicesAccessor->getData(),
+  //                        indicesAccessor->getSize());
+  //primitive->describeIndexData(indicesAccessor->getCount(),
+  //                             indicesAccessor->getComponentType());
   
   // Wrap the primitive in the material
   auto material = getMaterial(primitiveDoc.get("material", "").asUInt());

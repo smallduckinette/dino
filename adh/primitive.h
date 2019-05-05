@@ -1,16 +1,19 @@
 #ifndef __ADH_PRIMITIVE_H__
 #define __ADH_PRIMITIVE_H__
 
+#include <optional>
 #include <GL/glew.h>
 
 #include "node.h"
 
 namespace adh
 {
+  class Shader;
+  
   class Primitive : public Node
   {
   public:
-    Primitive();
+    Primitive(GLenum mode);
     ~Primitive();
 
     /// Call bind before setting arrays of data
@@ -28,22 +31,38 @@ namespace adh
                             GLenum componentType,
                             size_t stride,
                             size_t offset);
-    
+
+    /// Set geometry data
+    size_t setDataBuffer(const char * data,
+                         size_t size,
+                         GLint componentCount,
+                         GLenum componentType,
+                         bool normalize,
+                         size_t stride,
+                         size_t offset);
+      
     /// Set index data
-    void setIndexData(const char * data, size_t size);
+    void setIndicesBuffer(const char * data,
+                          size_t size,
+                          size_t count,
+                          GLenum type);
     
-    /// Describe index data
-    void describeIndexData(size_t count, GLenum type);
+    /// Set shader
+    void setShader(const std::shared_ptr<Shader> & shader);
     
   private:
     void draw(Context & context) const override;
     
     GLuint _vertexArray;
-    GLuint _vertexBuffer;
-    GLuint _elements;    
-
+    std::optional<GLuint> _elements;
+    std::vector<GLuint> _buffers;
+    
+    GLenum _mode;
+    
     GLsizei _count;
     GLenum _type;
+    
+    std::shared_ptr<Shader> _shader;
   };
 }
 

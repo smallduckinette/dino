@@ -17,7 +17,8 @@
 #include "adh/camera.h"
 #include "adh/shader.h"
 #include "adh/transform.h"
-#include "gltf/nodecache.h"
+#include "gltf/builder.h"
+
 
 namespace po = boost::program_options;
 
@@ -102,14 +103,13 @@ int main(int argc, char ** argv)
     BOOST_LOG_TRIVIAL(info) << "Renderer: " << renderer << std::endl;
     BOOST_LOG_TRIVIAL(info) << "Version: " << version << std::endl;
     
-    gltf::NodeCache nodeCache(shaderDir, model);
-    auto primitive = nodeCache.getScene();
+    gltf::Builder builder(shaderDir, model);
     auto transform = std::make_shared<adh::Transform>();
     auto camera = std::make_shared<adh::Camera>(glm::radians(45.0f),
                                                 (float)SCR_WIDTH / (float)SCR_HEIGHT,
                                                 0.1f,
                                                 100.0f);
-    transform->addChild(primitive);
+    transform->addChild(builder.build());
     camera->addChild(transform);
     
     auto t1 = std::chrono::system_clock::now();

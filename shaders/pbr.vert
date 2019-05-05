@@ -1,8 +1,14 @@
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aNorm;
-layout (location = 2) in vec2 aTex;
+#ifdef HAS_POSITION
+layout (location = POSITION) in vec3 aPos;
+#endif
+#ifdef HAS_NORMAL
+layout (location = NORMAL) in vec3 aNorm;
+#endif
+#ifdef HAS_TEXCOORD_0
+layout (location = TEXCOORD_0) in vec2 aTex;
+#endif
 #ifdef HAS_NORMAL_TEXTURE
-layout (location = 3) in vec4 aTan;
+layout (location = TANGENT) in vec4 aTan;
 #endif
 
 uniform mat4 modelMatrix;
@@ -22,7 +28,9 @@ out vec3 Normal;
 
 void main()
 {
+#ifdef HAS_TEXCOORD_0
    Tex = vec2(aTex.x, aTex.y);
+#endif
    World = vec3(modelMatrix * vec4(aPos, 1.0f));
    Normal = vec3(normalize(normalMatrix * vec4(aNorm, 1.0f)));
 

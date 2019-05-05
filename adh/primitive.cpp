@@ -1,32 +1,37 @@
 #include "primitive.h"
 
+#include "shader.h"
 
 
-adh::Primitive::Primitive()
+adh::Primitive::Primitive(GLenum mode):
+  _mode(mode)
 {
   glGenVertexArrays(1, &_vertexArray);
-  glGenBuffers(1, &_vertexBuffer);
-  glGenBuffers(1, &_elements);
+  //glGenBuffers(1, &_vertexBuffer);
 }
 
 adh::Primitive::~Primitive()
 {
-  glDeleteBuffers(1, &_elements);
-  glDeleteBuffers(1, &_vertexBuffer);  
+  for(auto && buffer : _buffers)
+  {
+    glDeleteBuffers(1, &buffer);
+  }
+  if(_elements)
+  {
+    glDeleteBuffers(1, &*_elements);
+  }
   glDeleteVertexArrays(1, &_vertexArray);
 }
 
 void adh::Primitive::bind()
 {
   glBindVertexArray(_vertexArray);
-  glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _elements);
 }
 
 void adh::Primitive::unbind()
 {
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  //glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);  
 }
 
@@ -50,22 +55,73 @@ void adh::Primitive::describeVertexData(size_t index,
   glEnableVertexAttribArray(index);  
 }
 
-void adh::Primitive::setIndexData(const char * data, size_t size)
+size_t adh::Primitive::setDataBuffer(const char * data,
+                                     size_t size,
+                                     GLint componentCount,
+                                     GLenum componentType,
+                                     bool normalize,
+                                     size_t stride,
+                                     size_t offset)
 {
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+  GLuint buffer;
+  glGenBuffers(1, &buffer);
+  _buffers.push_back(buffer);
+  size_t index = _buffers.size() - 1;
+  
+  glBindBuffer(GL_ARRAY_BUFFER, buffer);
+  glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+  glVertexAttribPointer(index,
+                        componentCount,
+                        componentType,
+                        normalize,
+                        stride,
+                        reinterpret_cast<void *>(offset));
+  glEnableVertexAttribArray(index);  
+  
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  return index;
 }
 
-void adh::Primitive::describeIndexData(size_t count, GLenum type)
+void adh::Primitive::setIndicesBuffer(const char * data,
+                                      size_t size,
+                                      size_t count,
+                                      GLenum type)
 {
+  GLuint elements;
+  glGenBuffers(1, &elements);
+  _elements = elements;
+  
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elements);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  
   _count = count;
   _type = type;
 }
 
+void adh::Primitive::setShader(const std::shared_ptr<Shader> & shader)
+{
+  _shader = shader;
+}
+
 void adh::Primitive::draw(Context & context) const
 {
+  _shader->use();
+  _shader->setMatrix("modelMatrix", context._model);
+  _shader->setMatrix("viewMatrix", context._view);
+  _shader->setMatrix("projectionMatrix", context._projection);
+  _shader->setMatrix("normalMatrix", glm::transpose(glm::inverse(context._model)));
+  _shader->setVector("camPos", context._camPos);
+  _shader->setVector("lightPosition", context._lightPosition);
+  _shader->setVector("lightColor", context._lightColor);
+  
   glBindVertexArray(_vertexArray);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _elements);
-  glDrawElements(GL_TRIANGLES, _count, _type, 0);
+  if(_elements)
+  {
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *_elements);
+  }
+  glDrawElements(_mode, _count, _type, 0);
   
   Node::draw(context);
 }
