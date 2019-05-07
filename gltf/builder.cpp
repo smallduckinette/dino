@@ -1,7 +1,6 @@
 #include "builder.h"
 
 #include <fstream>
-#include <iostream>
 
 #include "adh/node.h"
 #include "adh/transform.h"
@@ -144,8 +143,6 @@ std::unique_ptr<adh::Texture> gltf::Builder::buildTexture(const std::string & na
   if(!image._uri)
     throw std::runtime_error("No image uri in image " + std::to_string(*texture._source));
 
-  std::cout << *image._uri << std::endl;
-  
   return std::make_unique<adh::Texture>(name, _modelPath / (*image._uri));
 }
 

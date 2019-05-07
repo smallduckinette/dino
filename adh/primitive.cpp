@@ -3,8 +3,6 @@
 #include "shader.h"
 #include "texture.h"
 
-#include <iostream>
-
 adh::Primitive::Primitive(GLenum mode):
   _mode(mode)
 {

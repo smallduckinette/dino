@@ -6,20 +6,19 @@ in vec3 LightPos;
 in vec3 ViewPos;
 in vec3 FragPos;
 
+uniform vec4 diffuseColor;
+
 #ifdef HAS_DIFFUSE_TEXTURE
 uniform sampler2D diffuseMap;
-#else
-uniform vec4 diffuseColor;
 #endif
 
 #ifdef HAS_NORMAL_TEXTURE
 uniform sampler2D normalMap;
 #endif
 
+uniform vec4 mr;
 #ifdef HAS_METALROUGHNESS_TEXTURE
 uniform sampler2D metalroughnessMap;
-#else
-uniform vec4 mr;
 #endif
 
 uniform vec3 camPos;
@@ -70,19 +69,16 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 
 void main()
 {
+   vec4 tmr = mr;
 #ifdef HAS_METALROUGHNESS_TEXTURE
-   vec3 mr = vec3(texture(metalroughnessMap, Tex));
-   float metallic = mr.g;
-   float roughness = mr.r;
-#else
-   float metallic = mr.g;
-   float roughness = mr.r;
+   tmr *= texture(metalroughnessMap, Tex);
 #endif
+   float metallic = tmr.g;
+   float roughness = tmr.r;
 
-#ifdef HAS_DIFFUSE_TEXTURE
-   vec3 albedo = vec3(texture(diffuseMap, Tex));
-#else
    vec3 albedo = vec3(diffuseColor);
+#ifdef HAS_DIFFUSE_TEXTURE
+   albedo *= vec3(texture(diffuseMap, Tex));
 #endif
 
 #ifdef HAS_NORMAL_TEXTURE
