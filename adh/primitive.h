@@ -9,6 +9,7 @@
 namespace adh
 {
   class Shader;
+  class Texture;
   
   class Primitive : public Node
   {
@@ -47,6 +48,12 @@ namespace adh
                           size_t count,
                           GLenum type);
     
+    /// Set texture
+    void setTexture(const std::shared_ptr<Texture> & texture, GLenum textureIndex);
+    
+    /// Set color
+    void setColor(const std::string & label, const glm::vec4 & color);
+    
     /// Set shader
     void setShader(const std::shared_ptr<Shader> & shader);
     
@@ -56,6 +63,8 @@ namespace adh
     GLuint _vertexArray;
     std::optional<GLuint> _elements;
     std::vector<GLuint> _buffers;
+    std::vector<std::pair<GLenum, std::shared_ptr<Texture> > > _textures;
+    std::vector<std::pair<std::string, glm::vec4> > _colors;
     
     GLenum _mode;
     

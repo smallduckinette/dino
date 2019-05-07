@@ -47,6 +47,11 @@ adh::Texture::~Texture()
   glDeleteTextures(1, &_textureId);
 }
 
+std::string adh::Texture::getName() const
+{
+  return _name;
+}
+
 void adh::Texture::bind(GLenum texture)
 {
   glActiveTexture(texture);

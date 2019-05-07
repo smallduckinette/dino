@@ -1,17 +1,20 @@
 #include "builder.h"
 
 #include <fstream>
+#include <iostream>
 
 #include "adh/node.h"
 #include "adh/transform.h"
 #include "adh/primitive.h"
 #include "adh/shader.h"
+#include "adh/texture.h"
 #include "asset.h"
 
 gltf::Builder::Builder(const std::string & shaderPath,
                        const std::string & gltfFile):
   _shaderPath(std::filesystem::path(shaderPath)),
-  _asset(std::make_shared<Asset>(gltfFile))
+  _asset(std::make_shared<Asset>(gltfFile)),
+  _modelPath(std::filesystem::path(gltfFile).parent_path())
 {
 }
 
@@ -91,6 +94,35 @@ std::unique_ptr<adh::Node> gltf::Builder::buildMesh(size_t meshIndex) const
       
     }
     
+    if(primitive._material)
+    {
+      auto && material = _asset->_materials.at(*primitive._material);
+      if(material._pbrMetallicRoughness)
+      {
+        auto && pbr = *material._pbrMetallicRoughness;
+        primitiveNode->setColor("diffuseColor", pbr._baseColorFactor);
+        if(pbr._baseColorTexture)
+        {
+          primitiveNode->setTexture(buildTexture("diffuseMap", pbr._baseColorTexture->_index),
+                                    GL_TEXTURE0);
+          defines.push_back("HAS_DIFFUSE_TEXTURE");
+        }
+        primitiveNode->setColor("mr", glm::vec4(pbr._metallicFactor, pbr._roughnessFactor, 0, 0));
+        if(pbr._metallicRoughnessTexture)
+        {
+          primitiveNode->setTexture(buildTexture("metalroughnessMap", pbr._metallicRoughnessTexture->_index),
+                                    GL_TEXTURE2);
+          defines.push_back("HAS_METALROUGHNESS_TEXTURE");          
+        }
+      }
+      if(material._normalTexture)
+      {
+        primitiveNode->setTexture(buildTexture("normalMap", material._normalTexture->_index),
+                                  GL_TEXTURE1);
+        defines.push_back("HAS_NORMAL_TEXTURE");
+      }
+    }
+    
     primitiveNode->setShader(getShader(defines));
     node->addChild(primitiveNode);
     
@@ -98,6 +130,23 @@ std::unique_ptr<adh::Node> gltf::Builder::buildMesh(size_t meshIndex) const
   }
   
   return node;
+}
+
+std::unique_ptr<adh::Texture> gltf::Builder::buildTexture(const std::string & name,
+                                                          size_t textureIndex) const
+{
+  auto && texture = _asset->_textures.at(textureIndex);
+  if(!texture._source)
+    throw std::runtime_error("No source for texture " + std::to_string(textureIndex));
+  
+  auto && image = _asset->_images.at(*texture._source);
+  
+  if(!image._uri)
+    throw std::runtime_error("No image uri in image " + std::to_string(*texture._source));
+
+  std::cout << *image._uri << std::endl;
+  
+  return std::make_unique<adh::Texture>(name, _modelPath / (*image._uri));
 }
 
 void gltf::Builder::setIndicesBuffer(const std::shared_ptr<adh::Primitive> & primitiveNode,

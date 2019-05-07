@@ -163,7 +163,7 @@ std::shared_ptr<adh::Node> gltf::NodeCache::getPrimitive(const Json::Value & pri
     ++index;
     offset += accessor->getTypeSize() * accessor->getComponentSize();
   }
-    
+  
   BOOST_LOG_TRIVIAL(debug) << "Binding elements...";
   auto indicesAccessor = getAccessor(primitiveDoc.get("indices", "").asUInt());
   //primitive->setIndexData(indicesAccessor->getData(),

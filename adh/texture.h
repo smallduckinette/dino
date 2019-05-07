@@ -14,6 +14,7 @@ namespace adh
     ~Texture();
     
     void bind(GLenum texture);
+    std::string getName() const;
     
   private:
     std::string _name;

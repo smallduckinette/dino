@@ -10,6 +10,7 @@ namespace adh { class Node; }
 namespace adh { class Transform; }
 namespace adh { class Primitive; }
 namespace adh { class Shader; }
+namespace adh { class Texture; }
 
 namespace gltf
 {
@@ -27,6 +28,8 @@ namespace gltf
   private:
     std::unique_ptr<adh::Node> buildNode(size_t nodeIndex) const;
     std::unique_ptr<adh::Node> buildMesh(size_t meshIndex) const;
+    std::unique_ptr<adh::Texture> buildTexture(const std::string & name,
+                                               size_t textureIndex) const;
     
     void setIndicesBuffer(const std::shared_ptr<adh::Primitive> & primitiveNode,
                           const gltf::Accessor & accessor) const;
@@ -37,6 +40,7 @@ namespace gltf
     
     std::filesystem::path _shaderPath;
     std::shared_ptr<Asset> _asset;
+    std::filesystem::path _modelPath;
   };
 }
 

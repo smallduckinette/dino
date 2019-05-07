@@ -7,7 +7,7 @@ layout (location = NORMAL) in vec3 aNorm;
 #ifdef HAS_TEXCOORD_0
 layout (location = TEXCOORD_0) in vec2 aTex;
 #endif
-#ifdef HAS_NORMAL_TEXTURE
+#ifdef HAS_TANGENT
 layout (location = TANGENT) in vec4 aTan;
 #endif
 
