@@ -73,8 +73,8 @@ void main()
 #ifdef HAS_METALROUGHNESS_TEXTURE
    tmr *= texture(metalroughnessMap, Tex);
 #endif
-   float metallic = tmr.g;
-   float roughness = tmr.r;
+   float metallic = tmr.b;
+   float roughness = tmr.g;
 
    vec3 albedo = vec3(diffuseColor);
 #ifdef HAS_DIFFUSE_TEXTURE
@@ -96,7 +96,7 @@ void main()
    vec3 l = normalize(LightPos - FragPos);
    vec3 h = normalize(v + l);
    float distance = length(LightPos - FragPos);
-   float attenuation = 1.0;// / (distance * distance);
+   float attenuation = 1.0 / (distance * distance);
    vec3 radiance = lightColor * attenuation;
    
    // Cook-Torrance BRDF
@@ -121,4 +121,5 @@ void main()
    color = pow(color, vec3(1.0/2.2));
    
    FragColor = vec4(color, 1.0);
+   //FragColor = vec4(vec3(f0), 1.0);
 }

@@ -106,7 +106,7 @@ std::unique_ptr<adh::Node> gltf::Builder::buildMesh(size_t meshIndex) const
                                     GL_TEXTURE0);
           defines.push_back("HAS_DIFFUSE_TEXTURE");
         }
-        primitiveNode->setColor("mr", glm::vec4(pbr._metallicFactor, pbr._roughnessFactor, 0, 0));
+        primitiveNode->setColor("mr", glm::vec4(0, pbr._roughnessFactor, pbr._metallicFactor, 0));
         if(pbr._metallicRoughnessTexture)
         {
           primitiveNode->setTexture(buildTexture("metalroughnessMap", pbr._metallicRoughnessTexture->_index),

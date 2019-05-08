@@ -34,7 +34,7 @@ void main()
    World = vec3(modelMatrix * vec4(aPos, 1.0f));
    Normal = vec3(normalize(normalMatrix * vec4(aNorm, 1.0f)));
 
-#ifdef HAS_NORMAL_TEXTURE
+#ifdef HAS_TANGENT
    vec3 Tangent = vec3(normalize(normalMatrix * aTan));
    vec3 Bitangent = cross(Normal, Tangent) * aTan.w;
 

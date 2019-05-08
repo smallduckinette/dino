@@ -30,7 +30,7 @@ adh::Texture::Texture(const std::string & name,
                  imageData->w,
                  imageData->h,
                  0,
-                 GL_RGBA,
+                 mode,
                  GL_UNSIGNED_BYTE,
                  imageData->pixels);
     glGenerateMipmap(GL_TEXTURE_2D);
