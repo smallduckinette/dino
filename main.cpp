@@ -113,6 +113,22 @@ int main(int argc, char ** argv)
     camera->addChild(transform);
     
     auto t1 = std::chrono::system_clock::now();
+
+    // Joysticks
+    SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
+    BOOST_LOG_TRIVIAL(info) << "Found " << SDL_NumJoysticks() << " joysticks";
+    
+    SDL_Joystick * joy = NULL;
+    int numAxes = 0;
+    for(int index = 0; !joy && index < SDL_NumJoysticks(); ++index)
+    {
+      joy = SDL_JoystickOpen(index);
+      BOOST_LOG_TRIVIAL(info) << "Opened joystick " << SDL_JoystickName(joy);
+      BOOST_LOG_TRIVIAL(info) << "Number of Axes: " << SDL_JoystickNumAxes(joy);
+      BOOST_LOG_TRIVIAL(info) << "Number of Buttons: " << SDL_JoystickNumButtons(joy);
+      BOOST_LOG_TRIVIAL(info) << "Number of Balls: " << SDL_JoystickNumBalls(joy);
+      numAxes = SDL_JoystickNumAxes(joy);
+    }
     
     bool running = true;
     while(running)
@@ -123,6 +139,14 @@ int main(int argc, char ** argv)
         if(event.type == SDL_QUIT)
         {
           running = false;
+        }
+      }
+
+      if(joy)
+      {
+        for(int index = 0; index < numAxes; ++index)
+        {
+          BOOST_LOG_TRIVIAL(info) << index << " - " << SDL_JoystickGetAxis(joy, index);
         }
       }
       
