@@ -7,6 +7,9 @@
 #include <boost/log/trivial.hpp>
 #include <boost/log/expressions.hpp>
 #include <boost/program_options.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
+#undef GLM_ENABLE_EXPERIMENTAL
 
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
@@ -18,6 +21,7 @@
 #include "adh/shader.h"
 #include "adh/transform.h"
 #include "gltf/builder.h"
+#include "controller.h"
 
 
 namespace po = boost::program_options;
@@ -113,22 +117,14 @@ int main(int argc, char ** argv)
     camera->addChild(transform);
     
     auto t1 = std::chrono::system_clock::now();
-
-    // Joysticks
-    SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
-    BOOST_LOG_TRIVIAL(info) << "Found " << SDL_NumJoysticks() << " joysticks";
     
-    SDL_Joystick * joy = NULL;
-    int numAxes = 0;
-    for(int index = 0; !joy && index < SDL_NumJoysticks(); ++index)
-    {
-      joy = SDL_JoystickOpen(index);
-      BOOST_LOG_TRIVIAL(info) << "Opened joystick " << SDL_JoystickName(joy);
-      BOOST_LOG_TRIVIAL(info) << "Number of Axes: " << SDL_JoystickNumAxes(joy);
-      BOOST_LOG_TRIVIAL(info) << "Number of Buttons: " << SDL_JoystickNumButtons(joy);
-      BOOST_LOG_TRIVIAL(info) << "Number of Balls: " << SDL_JoystickNumBalls(joy);
-      numAxes = SDL_JoystickNumAxes(joy);
-    }
+    SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
+    Controller controller(0);
+    controller.onViewChange().connect
+      ([](const glm::vec2 & v)
+       {
+         BOOST_LOG_TRIVIAL(info) << glm::to_string(v);
+       });
     
     bool running = true;
     while(running)
@@ -141,14 +137,8 @@ int main(int argc, char ** argv)
           running = false;
         }
       }
-
-      if(joy)
-      {
-        for(int index = 0; index < numAxes; ++index)
-        {
-          BOOST_LOG_TRIVIAL(info) << index << " - " << SDL_JoystickGetAxis(joy, index);
-        }
-      }
+      
+      controller.update();
       
       glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
