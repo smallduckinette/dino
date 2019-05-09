@@ -121,9 +121,10 @@ int main(int argc, char ** argv)
     SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
     Controller controller(0);
     controller.onViewChange().connect
-      ([](const glm::vec2 & v)
+      ([&](const glm::vec2 & v)
        {
          BOOST_LOG_TRIVIAL(info) << glm::to_string(v);
+         camera->updateView(-v.x / 500, v.y / 500);
        });
     
     bool running = true;
@@ -143,7 +144,7 @@ int main(int argc, char ** argv)
       glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       
-      transform->setMatrix(glm::rotate(glm::mat4(1.0f), SDL_GetTicks() / 10000.0f, glm::vec3(0.5f, 1.0f, 0.0f)));
+      //transform->setMatrix(glm::rotate(glm::mat4(1.0f), SDL_GetTicks() / 10000.0f, glm::vec3(0.5f, 1.0f, 0.0f)));
       
       adh::Context context;
       camera->draw(context);

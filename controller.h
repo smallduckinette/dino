@@ -18,6 +18,8 @@ public:
   Signal<glm::vec2> & onPositionChange();
   
 private:
+  float normalize(Sint16 value) const;
+  
   std::unique_ptr<SDL_Joystick, decltype(&SDL_JoystickClose)> _joystick;
   
   Signal<glm::vec2> _viewSignal;
