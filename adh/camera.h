@@ -16,12 +16,11 @@ namespace adh
     
     void draw(Context & context) const override;
     
-    void updateView(float delta_heading, float delta_pitch);
+    void setViewMatrix(const glm::mat4 & view);
     
   private:
     glm::mat4 _projection;
-    float _heading;
-    float _pitch;
+    glm::mat4 _view;
   };
 }
 

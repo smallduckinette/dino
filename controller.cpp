@@ -15,9 +15,12 @@ Controller::Controller(int device_index):
 void Controller::update()
 {
   Sint16 view_x = SDL_JoystickGetAxis(_joystick.get(), 0);
-  Sint16 view_y = SDL_JoystickGetAxis(_joystick.get(), 1);
-  
+  Sint16 view_y = SDL_JoystickGetAxis(_joystick.get(), 1);  
   _viewSignal.emit(glm::vec2(normalize(view_x), normalize(view_y)));
+
+  Sint16 pos_x = SDL_JoystickGetAxis(_joystick.get(), 4);
+  Sint16 pos_y = SDL_JoystickGetAxis(_joystick.get(), 3);
+  _positionSignal.emit(glm::vec2(normalize(pos_x), normalize(pos_y)));
 }
 
 Signal<glm::vec2> & Controller::onViewChange()

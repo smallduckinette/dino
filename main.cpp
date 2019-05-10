@@ -22,6 +22,7 @@
 #include "adh/transform.h"
 #include "gltf/builder.h"
 #include "controller.h"
+#include "world.h"
 
 
 namespace po = boost::program_options;
@@ -115,19 +116,26 @@ int main(int argc, char ** argv)
                                                 100.0f);
     transform->addChild(builder.build());
     camera->addChild(transform);
-    
-    auto t1 = std::chrono::system_clock::now();
-    
+        
     SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
     Controller controller(0);
+    World world(camera);
+    
     controller.onViewChange().connect
       ([&](const glm::vec2 & v)
        {
          BOOST_LOG_TRIVIAL(info) << glm::to_string(v);
-         camera->updateView(-v.x / 500, v.y / 500);
+         world.onChangeView(v);
+       });
+    controller.onPositionChange().connect
+      ([&](const glm::vec2 & v)
+       {
+         BOOST_LOG_TRIVIAL(info) << glm::to_string(v);
+         world.onChangePosition(v);
        });
     
     bool running = true;
+    auto t1 = std::chrono::system_clock::now();
     while(running)
     {
       SDL_Event event;
@@ -139,22 +147,21 @@ int main(int argc, char ** argv)
         }
       }
       
+      auto t2 = std::chrono::system_clock::now();
+      std::chrono::duration<float> d = (t2 - t1);
+      BOOST_LOG_TRIVIAL(debug) << 1 / d.count() << std::endl;
+      t1 = t2;
+      
       controller.update();
+      world.run(d.count());
       
       glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      
-      //transform->setMatrix(glm::rotate(glm::mat4(1.0f), SDL_GetTicks() / 10000.0f, glm::vec3(0.5f, 1.0f, 0.0f)));
       
       adh::Context context;
       camera->draw(context);
       
       SDL_GL_SwapWindow(window.get());
-
-      auto t2 = std::chrono::system_clock::now();
-      std::chrono::duration<double> d = (t2 - t1);
-      BOOST_LOG_TRIVIAL(debug) << 1 / d.count() << std::endl;
-      t1 = t2;
     }
   }
   catch(const std::exception & e)
