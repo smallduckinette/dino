@@ -895,6 +895,162 @@ std::ostream & gltf::operator<<(std::ostream & str, const Image & image)
 }
 
 ////////////////////
+// Target
+////////////////////
+
+gltf::Target::Target(const Json::Value & targetDocument)
+{
+  get(targetDocument, "node", _node);
+  get(targetDocument, "path", _path);
+}
+
+gltf::Target::Target(const std::optional<size_t> & node,
+                     const std::string & path):
+  _node(node),
+  _path(path)
+{
+}
+
+bool gltf::Target::operator==(const Target & other) const
+{
+  return
+    _node == other._node &&
+    _path == other._path;
+}
+
+std::ostream & gltf::operator<<(std::ostream & str, const Target & target)
+{
+  str << "<"
+      << target._node << ", "
+      << target._path
+      << ">";
+  return str;
+}
+
+////////////////////
+// Channel
+////////////////////
+
+gltf::Channel::Channel(const Json::Value & channelDocument):
+  _target(getNodeOrThrow(channelDocument, "target"))
+{
+  get(channelDocument, "sampler", _sampler);
+}
+
+gltf::Channel::Channel(size_t sampler,
+                       const Target & target):
+  _sampler(sampler),
+  _target(target)
+{
+}
+
+bool gltf::Channel::operator==(const Channel & other) const
+{
+  return
+    _sampler == other._sampler &&
+    _target == other._target;
+}
+
+std::ostream & gltf::operator<<(std::ostream & str, const Channel & channel)
+{
+  str << "<"
+      << channel._sampler << ", "
+      << channel._target << ", "
+      << ">";
+  return str;
+}
+
+////////////////////
+// AnimationSampler
+////////////////////
+
+gltf::AnimationSampler::AnimationSampler(const Json::Value & samplerDocument)
+{
+  get(samplerDocument, "input", _input);
+  get(samplerDocument, "interpolation", _interpolation);
+  get(samplerDocument, "output", _output);
+}
+
+gltf::AnimationSampler::AnimationSampler(size_t input,
+                                         const std::string & interpolation,
+                                         size_t output):
+  _input(input),
+  _interpolation(interpolation),
+  _output(output)
+{
+}
+
+bool gltf::AnimationSampler::operator==(const AnimationSampler & other) const
+{
+  return
+    _input == other._input &&
+    _interpolation == other._interpolation &&
+    _output == other._output;
+}
+
+std::ostream & gltf::operator<<(std::ostream & str, const AnimationSampler & sampler)
+{
+  str << "<"
+      << sampler._input << ", "
+      << sampler._interpolation << ", "
+      << sampler._output
+      << ">";
+  return str;
+}
+
+////////////////////
+// Animation
+////////////////////
+
+gltf::Animation::Animation(const Json::Value & animationDocument)
+{
+  const Json::Value * channelsDoc = getNode(animationDocument, "channels");
+  if(channelsDoc)
+  {
+    for(auto && channelDoc : *channelsDoc)
+    {
+      _channels.push_back(Channel(channelDoc));
+    }
+  }
+  const Json::Value * samplersDoc = getNode(animationDocument, "samplers");
+  if(samplersDoc)
+  {
+    for(auto && samplerDoc : *samplersDoc)
+    {
+      _samplers.push_back(AnimationSampler(samplerDoc));
+    }
+  }    
+  get(animationDocument, "name", _name);
+}
+
+gltf::Animation::Animation(const std::vector<Channel> & channels,
+                           const std::vector<AnimationSampler> & samplers,
+                           const std::optional<std::string> & name):
+  _channels(channels),
+  _samplers(samplers),
+  _name(name)
+{
+}
+
+bool gltf::Animation::operator==(const Animation & other) const
+{
+  return
+    _channels == other._channels &&
+    _samplers == other._samplers &&
+    _name == other._name;
+}
+
+std::ostream & gltf::operator<<(std::ostream & str, const Animation & animation)
+{
+  str << "<"
+      << animation._channels << ", "
+      << animation._samplers << ", "
+      << animation._name
+      << ">";
+  return str;
+}
+
+////////////////////
 // Asset
 ////////////////////
 
@@ -1006,5 +1162,15 @@ gltf::Asset::Asset(const std::string & gltfFile)
     {
       _images.push_back(Image(imageDoc));
     }
-  }  
+  }
+
+  // Animations
+  const Json::Value * animationsDoc = getNode(document, "animations");
+  if(animationsDoc)
+  {
+    for(auto && animationDoc : *animationsDoc)
+    {
+      _animations.push_back(Animation(animationDoc));
+    }
+  }
 }

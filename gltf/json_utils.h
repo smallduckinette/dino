@@ -35,6 +35,9 @@ namespace gltf
   const Json::Value * getNode(const Json::Value & document,
                               const std::string & name);
   
+  const Json::Value & getNodeOrThrow(const Json::Value & document,
+                                     const std::string & name);
+  
   void get(const Json::Value & document,
            const std::string & name,
            glm::mat4 & value);

@@ -69,6 +69,16 @@ const Json::Value * gltf::getNode(const Json::Value & document,
   return document.find(name.c_str(), name.c_str() + name.size());
 }
 
+const Json::Value & gltf::getNodeOrThrow(const Json::Value & document,
+                                         const std::string & name)
+{
+  const Json::Value * node = getNode(document, name);
+  if(node)
+    return *node;
+  else
+    throw std::runtime_error("Cannot find expected node " + name);
+}
+
 void gltf::get(const Json::Value & document,
                const std::string & name,
                glm::mat4 & value)

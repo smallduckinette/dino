@@ -112,4 +112,20 @@ BOOST_AUTO_TEST_CASE(testLoadSimpleAsset)
   }
 }
 
+BOOST_AUTO_TEST_CASE(testLoadAnimation)
+{
+  gltf::Asset asset("../models/samples/translate.gltf");
+
+  // Animations
+  {
+    std::vector<gltf::Animation> expected{
+      gltf::Animation({gltf::Channel(0, gltf::Target(3, "translation"))},
+                      {gltf::AnimationSampler(8, "CUBICSPLINE", 9)},
+                      "Cylinder.001Action")
+        };
+    
+    BOOST_TEST(expected == asset._animations, boost::test_tools::per_element());
+  }
+}
+
 BOOST_AUTO_TEST_SUITE_END()

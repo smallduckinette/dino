@@ -69,8 +69,8 @@ int main(int argc, char ** argv)
     if(SDL_Init(SDL_INIT_VIDEO) < 0)
       throw std::runtime_error(std::string("Failed to init SDL : ") + SDL_GetError());
 
-    const int SCR_WIDTH = 800;
-    const int SCR_HEIGHT = 600;
+    const int SCR_WIDTH = 1024;
+    const int SCR_HEIGHT = 768;
     
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
@@ -124,13 +124,11 @@ int main(int argc, char ** argv)
     controller.onViewChange().connect
       ([&](const glm::vec2 & v)
        {
-         BOOST_LOG_TRIVIAL(info) << glm::to_string(v);
          world.onChangeView(v);
        });
     controller.onPositionChange().connect
       ([&](const glm::vec2 & v)
        {
-         BOOST_LOG_TRIVIAL(info) << glm::to_string(v);
          world.onChangePosition(v);
        });
     

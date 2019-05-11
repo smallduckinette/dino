@@ -338,6 +338,70 @@ namespace gltf
   };
 
   std::ostream & operator<<(std::ostream & str, const Image & image);
+
+  class Target
+  {
+  public:
+    Target(const Json::Value & targetDocument);
+    Target(const std::optional<size_t> & node,
+           const std::string & path);
+    
+    std::optional<size_t> _node;
+    std::string _path;
+
+    bool operator==(const Target & other) const;
+  };
+  
+  std::ostream & operator<<(std::ostream & str, const Target & target);
+  
+  class Channel
+  {
+  public:
+    Channel(const Json::Value & channelDocument);
+    Channel(size_t sampler,
+            const Target & target);
+    
+    size_t _sampler;
+    Target _target;
+
+    bool operator==(const Channel & other) const;
+  };
+  
+  std::ostream & operator<<(std::ostream & str, const Channel & channel);
+
+  class AnimationSampler
+  {
+  public:
+    AnimationSampler(const Json::Value & samplerDocument);
+    AnimationSampler(size_t input,
+                     const std::string & interpolation,
+                     size_t output);
+    
+    size_t _input;
+    std::string _interpolation;
+    size_t _output;
+
+    bool operator==(const AnimationSampler & other) const;
+  };
+  
+  std::ostream & operator<<(std::ostream & str, const AnimationSampler & sampler);
+  
+  class Animation
+  {
+  public:
+    Animation(const Json::Value & animationDocument);
+    Animation(const std::vector<Channel> & channels,
+              const std::vector<AnimationSampler> & samplers,
+              const std::optional<std::string> & name);
+    
+    std::vector<Channel> _channels;
+    std::vector<AnimationSampler> _samplers;
+    std::optional<std::string> _name;
+
+    bool operator==(const Animation & other) const;
+  };
+
+  std::ostream & operator<<(std::ostream & str, const Animation & animation);
   
   class Asset
   {
@@ -355,6 +419,7 @@ namespace gltf
     std::vector<Texture> _textures;
     std::vector<Sampler> _samplers;
     std::vector<Image> _images;
+    std::vector<Animation> _animations;
   };
 }
 
