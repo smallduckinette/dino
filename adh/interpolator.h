@@ -10,6 +10,7 @@ namespace adh
   {
   public:
     virtual T get(float t) const = 0;
+    virtual float getMax() const = 0;
   };
   
   template<typename T>
@@ -40,6 +41,14 @@ namespace adh
         float n = (t - t1->first) / (t2->first - t1->first);
         return (1 - n) * t1->second + n * t2->second;
       }
+    }
+
+    float getMax() const override
+    {
+      if(_values.empty())
+        return 0;
+      else
+        return _values.rbegin()->first;
     }
     
   private:
@@ -91,6 +100,14 @@ namespace adh
       }
     }
     
+    float getMax() const override
+    {
+      if(_values.empty())
+        return 0;
+      else
+        return _values.rbegin()->first;
+    }
+
   private:
     std::map<float, std::tuple<T, T, T> > _values;
   };
