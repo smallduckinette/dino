@@ -7,10 +7,14 @@
 #include "adh/primitive.h"
 #include "adh/shader.h"
 #include "adh/texture.h"
+#include "adh/animation.h"
+#include "adh/channel.h"
 #include "asset.h"
 
-gltf::Builder::Builder(const std::string & shaderPath,
+gltf::Builder::Builder(const std::shared_ptr<adh::Clock> & clock,
+                       const std::string & shaderPath,
                        const std::string & gltfFile):
+  _clock(clock),
   _shaderPath(std::filesystem::path(shaderPath)),
   _asset(std::make_shared<Asset>(gltfFile)),
   _modelPath(std::filesystem::path(gltfFile).parent_path())
@@ -23,20 +27,53 @@ std::unique_ptr<adh::Node> gltf::Builder::build() const
   
   auto sceneNode = std::make_unique<adh::Node>(scene._name.value_or(std::string()));
   
+  std::map<size_t, std::shared_ptr<adh::Transform> > animationNodes;
+
+  // Build all the nodes for the scene
   for(auto && nodeIndex : scene._nodes)
   {
-    sceneNode->addChild(buildNode(nodeIndex));
+    sceneNode->addChild(buildNode(nodeIndex, animationNodes));
+  }
+  
+  // Build all the animations for the scene
+  for(auto && animation : _asset->_animations)
+  {
+    auto && animationControl =
+      std::make_unique<adh::Animation>(animation._name.value_or(std::string()),
+                                       _clock);
+    for(auto && channel : animation._channels)
+    {
+      //auto && sampler = animation._samplers.at(channel._sampler);
+      if(!channel._target._node)
+        throw std::runtime_error("Animation does not have target node");
+      auto targetNodeIt = animationNodes.find(*channel._target._node);
+      if(targetNodeIt == animationNodes.end())
+        throw std::runtime_error("Animation targets unknown node");
+      
+      if(channel._target._path == "translation")
+      {
+        animationControl->addChannel
+          (std::make_unique<adh::InterpolatedChannel<glm::vec3> >
+           (nullptr,
+            targetNodeIt->second,
+            [](adh::Transform * transform, const glm::vec3 & t)
+            {
+              transform->setTranslate(t);
+            }));
+      }
+    }
   }
   
   return sceneNode;
 }
 
-std::unique_ptr<adh::Node> gltf::Builder::buildNode(size_t nodeIndex) const
+std::shared_ptr<adh::Node> gltf::Builder::buildNode(size_t nodeIndex, std::map<size_t, std::shared_ptr<adh::Transform> > & animationNodes) const
 {
   // Create the node
   auto && node = _asset->_nodes.at(nodeIndex);
-  auto transform = std::make_unique<adh::Transform>(node._name.value_or(std::string()));
-
+  auto transform = std::make_shared<adh::Transform>(node._name.value_or(std::string()));
+  animationNodes.insert({nodeIndex, transform});
+  
   // Configure the transformation
   if(node._matrix)
     transform->setMatrix(*node._matrix);
@@ -53,7 +90,7 @@ std::unique_ptr<adh::Node> gltf::Builder::buildNode(size_t nodeIndex) const
   // Recursively build children
   for(auto && childIndex : node._children)
   {
-    transform->addChild(buildNode(childIndex));
+    transform->addChild(buildNode(childIndex, animationNodes));
   }
 
   // Build the mesh if present
@@ -61,7 +98,7 @@ std::unique_ptr<adh::Node> gltf::Builder::buildNode(size_t nodeIndex) const
   {
     transform->addChild(buildMesh(*node._mesh));
   }
-  
+
   return transform;
 }
 

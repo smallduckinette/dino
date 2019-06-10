@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <map>
 #include <filesystem>
 
 namespace adh { class Node; }
@@ -11,6 +12,7 @@ namespace adh { class Transform; }
 namespace adh { class Primitive; }
 namespace adh { class Shader; }
 namespace adh { class Texture; }
+namespace adh { class Clock; }
 
 namespace gltf
 {
@@ -20,13 +22,14 @@ namespace gltf
   class Builder
   {
   public:
-    Builder(const std::string & shaderPath,
+    Builder(const std::shared_ptr<adh::Clock> & clock,
+            const std::string & shaderPath,
             const std::string & gltfFile);
     
     std::unique_ptr<adh::Node> build() const;
     
   private:
-    std::unique_ptr<adh::Node> buildNode(size_t nodeIndex) const;
+    std::shared_ptr<adh::Node> buildNode(size_t nodeIndex, std::map<size_t, std::shared_ptr<adh::Transform> > & animationNodes) const;
     std::unique_ptr<adh::Node> buildMesh(size_t meshIndex) const;
     std::unique_ptr<adh::Texture> buildTexture(const std::string & name,
                                                size_t textureIndex) const;
@@ -38,6 +41,7 @@ namespace gltf
     
     std::shared_ptr<adh::Shader> getShader(const std::vector<std::string> & defines) const;
     
+    std::shared_ptr<adh::Clock> _clock;
     std::filesystem::path _shaderPath;
     std::shared_ptr<Asset> _asset;
     std::filesystem::path _modelPath;

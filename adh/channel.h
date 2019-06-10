@@ -32,7 +32,7 @@ namespace adh
     
     void update(float timestamp) override
     {
-      _f(_transform.get(), _interpolator.get(timestamp));
+      _f(_transform.get(), _interpolator->get(timestamp));
     }
 
     float getMaxTimestamp() const override
@@ -43,7 +43,7 @@ namespace adh
   private:
     std::unique_ptr<Interpolator<T> > _interpolator;
     std::shared_ptr<Transform> _transform;
-    std::function<void(const T &)> _f;
+    std::function<void(Transform * transform, const T &)> _f;
   };
 }
 

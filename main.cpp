@@ -20,6 +20,7 @@
 #include "adh/camera.h"
 #include "adh/shader.h"
 #include "adh/transform.h"
+#include "adh/rtclock.h"
 #include "gltf/builder.h"
 #include "controller.h"
 #include "world.h"
@@ -108,7 +109,9 @@ int main(int argc, char ** argv)
     BOOST_LOG_TRIVIAL(info) << "Renderer: " << renderer << std::endl;
     BOOST_LOG_TRIVIAL(info) << "Version: " << version << std::endl;
     
-    gltf::Builder builder(shaderDir, model);
+    auto clock = std::make_shared<adh::RtClock>();
+    
+    gltf::Builder builder(clock, shaderDir, model);
     auto transform = std::make_shared<adh::Transform>();
     auto camera = std::make_shared<adh::Camera>(glm::radians(45.0f),
                                                 (float)SCR_WIDTH / (float)SCR_HEIGHT,
@@ -133,7 +136,7 @@ int main(int argc, char ** argv)
        });
     
     bool running = true;
-    auto t1 = std::chrono::system_clock::now();
+    auto t1 = std::chrono::steady_clock::now();
     while(running)
     {
       SDL_Event event;
@@ -145,7 +148,7 @@ int main(int argc, char ** argv)
         }
       }
       
-      auto t2 = std::chrono::system_clock::now();
+      auto t2 = std::chrono::steady_clock::now();
       std::chrono::duration<float> d = (t2 - t1);
       BOOST_LOG_TRIVIAL(debug) << 1 / d.count() << std::endl;
       t1 = t2;
