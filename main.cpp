@@ -21,6 +21,7 @@
 #include "adh/shader.h"
 #include "adh/transform.h"
 #include "adh/rtclock.h"
+#include "adh/animation.h"
 #include "gltf/builder.h"
 #include "controller.h"
 #include "world.h"
@@ -117,9 +118,16 @@ int main(int argc, char ** argv)
                                                 (float)SCR_WIDTH / (float)SCR_HEIGHT,
                                                 0.1f,
                                                 100.0f);
-    transform->addChild(builder.build());
+    std::vector<std::unique_ptr<adh::Animation> > animations;
+    transform->addChild(builder.build(animations));
     camera->addChild(transform);
-        
+
+    for(auto && animation : animations)
+    {
+      animation->start();
+      animation->setLoop(true);
+    }
+    
     SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
     Controller controller(0);
     World world(camera);
@@ -154,6 +162,10 @@ int main(int argc, char ** argv)
       t1 = t2;
       
       controller.update();
+      for(auto && animation : animations)
+      {
+        animation->update();
+      }      
       world.run(d.count());
       
       glClearColor(0.7f, 0.7f, 0.7f, 1.0f);

@@ -5,6 +5,8 @@
 #include <memory>
 #include <vector>
 
+#include "channel.h"
+
 namespace adh
 {
   class Channel;

@@ -11,6 +11,12 @@
 #include "adh/channel.h"
 #include "asset.h"
 
+#include <iostream>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
+#undef GLM_ENABLE_EXPERIMENTAL
+
+
 gltf::Builder::Builder(const std::shared_ptr<adh::Clock> & clock,
                        const std::string & shaderPath,
                        const std::string & gltfFile):
@@ -21,7 +27,7 @@ gltf::Builder::Builder(const std::shared_ptr<adh::Clock> & clock,
 {
 }
 
-std::unique_ptr<adh::Node> gltf::Builder::build() const
+std::unique_ptr<adh::Node> gltf::Builder::build(std::vector<std::unique_ptr<adh::Animation> > & animations) const
 {
   auto && scene = _asset->_scenes.at(_asset->_scene);
   
@@ -43,7 +49,7 @@ std::unique_ptr<adh::Node> gltf::Builder::build() const
                                        _clock);
     for(auto && channel : animation._channels)
     {
-      //auto && sampler = animation._samplers.at(channel._sampler);
+      auto && sampler = animation._samplers.at(channel._sampler);
       if(!channel._target._node)
         throw std::runtime_error("Animation does not have target node");
       auto targetNodeIt = animationNodes.find(*channel._target._node);
@@ -54,7 +60,7 @@ std::unique_ptr<adh::Node> gltf::Builder::build() const
       {
         animationControl->addChannel
           (std::make_unique<adh::InterpolatedChannel<glm::vec3> >
-           (nullptr,
+           (buildVec3Interpolator(sampler),
             targetNodeIt->second,
             [](adh::Transform * transform, const glm::vec3 & t)
             {
@@ -62,6 +68,8 @@ std::unique_ptr<adh::Node> gltf::Builder::build() const
             }));
       }
     }
+    
+    animations.push_back(std::move(animationControl));
   }
   
   return sceneNode;
@@ -229,4 +237,64 @@ std::shared_ptr<adh::Shader> gltf::Builder::getShader(const std::vector<std::str
   return std::make_shared<adh::Shader>(vertex,
                                        fragment,
                                        defines);
+}
+
+std::unique_ptr<adh::Interpolator<glm::vec3> > gltf::Builder::buildVec3Interpolator(const AnimationSampler & sampler) const
+{
+  auto && tsAccessor = _asset->_accessors.at(sampler._input);
+  if(!tsAccessor._bufferView)
+    throw std::runtime_error("No buffer view for animation accessor");
+  auto && tsBufferView = _asset->_bufferViews.at(*tsAccessor._bufferView);
+  auto && tsBuffer = _asset->_buffers.at(tsBufferView._buffer);
+  
+  const char * tsData = tsBuffer._data.data() + tsBufferView._byteOffset;
+  const float * tsFloatData = reinterpret_cast<const float *>(tsData);
+  
+  auto && valAccessor = _asset->_accessors.at(sampler._output);
+  if(!valAccessor._bufferView)
+    throw std::runtime_error("No buffer view for animation accessor");
+  auto && valBufferView = _asset->_bufferViews.at(*valAccessor._bufferView);
+  auto && valBuffer = _asset->_buffers.at(valBufferView._buffer);
+  
+  const char * valData = valBuffer._data.data() + valBufferView._byteOffset;
+  const glm::vec3 * valFloatData = reinterpret_cast<const glm::vec3 *>(valData);
+  
+  if(sampler._interpolation == "LINEAR")
+  {
+    std::map<float, glm::vec3> values;
+    
+    for(size_t index = 0; index < tsAccessor._count; ++index)
+    {
+      values.insert({tsFloatData[index], valFloatData[index]});
+    }
+    
+    return std::make_unique<adh::LinearInterpolator<glm::vec3> >(values);
+  }
+  else if(sampler._interpolation == "CUBICSPLINE")
+  {
+    std::map<float, std::tuple<glm::vec3, glm::vec3, glm::vec3> > values;
+    
+    for(size_t index = 0; index < tsAccessor._count; ++index)
+    {
+      values.insert({tsFloatData[index],
+          {
+            valFloatData[index + tsAccessor._count],
+              valFloatData[index],
+              valFloatData[index + 2 * tsAccessor._count]
+              }});
+    }
+    
+    for(auto && val : values)
+    {
+      std::cout << val.first
+                << " " << glm::to_string(std::get<0>(val.second))
+                << " " << glm::to_string(std::get<1>(val.second))
+                << " " << glm::to_string(std::get<2>(val.second))
+                << std::endl;
+    }
+
+    return std::make_unique<adh::CubicSplineInterpolator<glm::vec3> >(values);
+  }
+  else
+    throw std::runtime_error("Unknown interpolation type " + sampler._interpolation);
 }

@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include <filesystem>
+#include <glm/glm.hpp>
 
 namespace adh { class Node; }
 namespace adh { class Transform; }
@@ -13,11 +14,14 @@ namespace adh { class Primitive; }
 namespace adh { class Shader; }
 namespace adh { class Texture; }
 namespace adh { class Clock; }
+namespace adh { class Animation; }
+namespace adh { template<typename T> class Interpolator; }
 
 namespace gltf
 {
   class Asset;
   class Accessor;
+  class AnimationSampler;
   
   class Builder
   {
@@ -26,13 +30,14 @@ namespace gltf
             const std::string & shaderPath,
             const std::string & gltfFile);
     
-    std::unique_ptr<adh::Node> build() const;
+    std::unique_ptr<adh::Node> build(std::vector<std::unique_ptr<adh::Animation> > & animations) const;
     
   private:
     std::shared_ptr<adh::Node> buildNode(size_t nodeIndex, std::map<size_t, std::shared_ptr<adh::Transform> > & animationNodes) const;
     std::unique_ptr<adh::Node> buildMesh(size_t meshIndex) const;
     std::unique_ptr<adh::Texture> buildTexture(const std::string & name,
                                                size_t textureIndex) const;
+    std::unique_ptr<adh::Interpolator<glm::vec3> > buildVec3Interpolator(const gltf::AnimationSampler & sampler) const;
     
     void setIndicesBuffer(const std::shared_ptr<adh::Primitive> & primitiveNode,
                           const gltf::Accessor & accessor) const;
