@@ -37,7 +37,8 @@ namespace gltf
     std::unique_ptr<adh::Node> buildMesh(size_t meshIndex) const;
     std::unique_ptr<adh::Texture> buildTexture(const std::string & name,
                                                size_t textureIndex) const;
-    std::unique_ptr<adh::Interpolator<glm::vec3> > buildVec3Interpolator(const gltf::AnimationSampler & sampler) const;
+    template<typename T>
+    std::unique_ptr<adh::Interpolator<T> > buildInterpolator(const gltf::AnimationSampler & sampler) const;
     
     void setIndicesBuffer(const std::shared_ptr<adh::Primitive> & primitiveNode,
                           const gltf::Accessor & accessor) const;

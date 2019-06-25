@@ -60,11 +60,22 @@ std::unique_ptr<adh::Node> gltf::Builder::build(std::vector<std::unique_ptr<adh:
       {
         animationControl->addChannel
           (std::make_unique<adh::InterpolatedChannel<glm::vec3> >
-           (buildVec3Interpolator(sampler),
+           (buildInterpolator<glm::vec3>(sampler),
             targetNodeIt->second,
             [](adh::Transform * transform, const glm::vec3 & t)
             {
               transform->setTranslate(t);
+            }));
+      }
+      else if(channel._target._path == "rotation")
+      {
+        animationControl->addChannel
+          (std::make_unique<adh::InterpolatedChannel<glm::quat> >
+           (buildInterpolator<glm::quat>(sampler),
+            targetNodeIt->second,
+            [](adh::Transform * transform, const glm::quat & t)
+            {
+              transform->setRotate(t);
             }));
       }
     }
@@ -239,7 +250,8 @@ std::shared_ptr<adh::Shader> gltf::Builder::getShader(const std::vector<std::str
                                        defines);
 }
 
-std::unique_ptr<adh::Interpolator<glm::vec3> > gltf::Builder::buildVec3Interpolator(const AnimationSampler & sampler) const
+template<typename T>
+std::unique_ptr<adh::Interpolator<T> > gltf::Builder::buildInterpolator(const AnimationSampler & sampler) const
 {
   auto && tsAccessor = _asset->_accessors.at(sampler._input);
   if(!tsAccessor._bufferView)
@@ -257,22 +269,22 @@ std::unique_ptr<adh::Interpolator<glm::vec3> > gltf::Builder::buildVec3Interpola
   auto && valBuffer = _asset->_buffers.at(valBufferView._buffer);
   
   const char * valData = valBuffer._data.data() + valBufferView._byteOffset;
-  const glm::vec3 * valFloatData = reinterpret_cast<const glm::vec3 *>(valData);
+  const T * valFloatData = reinterpret_cast<const T *>(valData);
   
   if(sampler._interpolation == "LINEAR")
   {
-    std::map<float, glm::vec3> values;
+    std::map<float, T> values;
     
     for(size_t index = 0; index < tsAccessor._count; ++index)
     {
       values.insert({tsFloatData[index], valFloatData[index]});
     }
     
-    return std::make_unique<adh::LinearInterpolator<glm::vec3> >(values);
+    return std::make_unique<adh::LinearInterpolator<T> >(values);
   }
   else if(sampler._interpolation == "CUBICSPLINE")
   {
-    std::map<float, std::tuple<glm::vec3, glm::vec3, glm::vec3> > values;
+    std::map<float, std::tuple<T, T, T> > values;
     
     for(size_t index = 0; index < tsAccessor._count; ++index)
     {
@@ -293,7 +305,7 @@ std::unique_ptr<adh::Interpolator<glm::vec3> > gltf::Builder::buildVec3Interpola
                 << std::endl;
     }
 
-    return std::make_unique<adh::CubicSplineInterpolator<glm::vec3> >(values);
+    return std::make_unique<adh::CubicSplineInterpolator<T> >(values);
   }
   else
     throw std::runtime_error("Unknown interpolation type " + sampler._interpolation);
