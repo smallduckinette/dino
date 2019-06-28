@@ -91,7 +91,9 @@ std::shared_ptr<adh::Node> gltf::Builder::buildNode(size_t nodeIndex, std::map<s
   // Create the node
   auto && node = _asset->_nodes.at(nodeIndex);
   auto transform = std::make_shared<adh::Transform>(node._name.value_or(std::string()));
-  animationNodes.insert({nodeIndex, transform});
+  auto animation = std::make_shared<adh::Transform>(node._name.value_or(std::string()) + " animation");
+  transform->addChild(animation);
+  animationNodes.insert({nodeIndex, animation});
   
   // Configure the transformation
   if(node._matrix)
@@ -109,15 +111,15 @@ std::shared_ptr<adh::Node> gltf::Builder::buildNode(size_t nodeIndex, std::map<s
   // Recursively build children
   for(auto && childIndex : node._children)
   {
-    transform->addChild(buildNode(childIndex, animationNodes));
+    animation->addChild(buildNode(childIndex, animationNodes));
   }
 
   // Build the mesh if present
   if(node._mesh)
   {
-    transform->addChild(buildMesh(*node._mesh));
+    animation->addChild(buildMesh(*node._mesh));
   }
-
+  
   return transform;
 }
 
