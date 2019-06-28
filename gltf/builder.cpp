@@ -78,6 +78,17 @@ std::unique_ptr<adh::Node> gltf::Builder::build(std::vector<std::unique_ptr<adh:
               transform->setRotate(t);
             }));
       }
+      else if(channel._target._path == "scale")
+      {
+        animationControl->addChannel
+          (std::make_unique<adh::InterpolatedChannel<glm::vec3> >
+           (buildInterpolator<glm::vec3>(sampler),
+            targetNodeIt->second,
+            [](adh::Transform * transform, const glm::vec3 & t)
+            {
+              transform->setScale(t);
+            }));        
+      }
     }
     
     animations.push_back(std::move(animationControl));
