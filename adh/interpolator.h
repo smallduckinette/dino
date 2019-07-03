@@ -2,9 +2,21 @@
 #define __ADH_INTERPOLATOR_H__
 
 #include <map>
+#include <glm/gtc/quaternion.hpp>
 
 namespace adh
 {
+  template<typename T>
+  T interpolate(const T & left, const T & right, float n)
+  {
+    return (1 - n) * left + n * right;
+  }
+  
+  inline glm::quat interpolate(const glm::quat & left, const glm::quat & right, float n)
+  {
+    return glm::slerp(left, right, n);
+  }  
+  
   template<typename T>
   class Interpolator
   {
@@ -39,7 +51,7 @@ namespace adh
         auto t2 = it;
         
         float n = (t - t1->first) / (t2->first - t1->first);
-        return (1 - n) * t1->second + n * t2->second;
+        return interpolate(t1->second, t2->second, n);
       }
     }
 
