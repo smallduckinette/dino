@@ -3,6 +3,11 @@
 
 #include <map>
 #include <glm/gtc/quaternion.hpp>
+#include <iostream>
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
+#undef GLM_ENABLE_EXPERIMENTAL
 
 namespace adh
 {
@@ -94,16 +99,16 @@ namespace adh
         
         float n = (t - t1->first) / (t2->first - t1->first);
         
-        T vk = std::get<0>(t1->second);
+        T vk = std::get<1>(t1->second);
         T bk = std::get<2>(t1->second);
-        T vk1 = std::get<0>(t2->second);
-        T ak1 = std::get<1>(t2->second);
-
+        T vk1 = std::get<1>(t2->second);
+        T ak1 = std::get<0>(t2->second);
+        
         T p0 = vk;
         T m0 = (t2->first - t1->first) * bk;
         T p1 = vk1;
         T m1 = (t2->first - t1->first) * ak1;
-        
+
         return
           (2 * n * n * n - 3 * n * n + 1) * p0 +
           (n * n * n - 2 * n * n + n) * m0 +

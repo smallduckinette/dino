@@ -18,9 +18,5 @@ include_directories(${SDL2_INCLUDE_DIRS} ${SDL2IMAGE_INCLUDE_DIRS} ${GLEW_INCLUD
 
 add_subdirectory(adh)
 add_subdirectory(gltf)
-
-add_executable(dino controller.cpp main.cpp world.cpp)
-target_link_libraries(dino gltf adh ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${JSONCPP_LIBRARIES} ${Boost_LIBRARIES} stdc++fs)
-
-add_executable(tests test_main.cpp test_gltf.cpp test_interpolator.cpp)
-target_link_libraries(tests gltf adh ${SDL2_LIBRARIES} ${SDL2IMAGE_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} ${JSONCPP_LIBRARIES} ${Boost_LIBRARIES} stdc++fs)
+add_subdirectory(tests)
+add_subdirectory(dino)

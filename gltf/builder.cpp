@@ -303,12 +303,17 @@ std::unique_ptr<adh::Interpolator<T> > gltf::Builder::buildInterpolator(const An
     {
       values.insert({tsFloatData[index],
           {
-            valFloatData[index + tsAccessor._count],
-              valFloatData[index],
-              valFloatData[index + 2 * tsAccessor._count]
+            valFloatData[index * 3],
+              valFloatData[index * 3 + 1],
+              valFloatData[index * 3 + 2]
               }});
     }
     
+    //for(size_t index = 0; index < tsAccessor._count * 3; ++index)
+    //{
+    //  std::cout << glm::to_string(valFloatData[index]) << std::endl;
+    //}
+      
     for(auto && val : values)
     {
       std::cout << val.first
