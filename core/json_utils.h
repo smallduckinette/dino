@@ -7,7 +7,7 @@
 #include <json/json.h>
 #include <glm/glm.hpp>
 
-namespace gltf
+namespace core
 {
   namespace detail
   {

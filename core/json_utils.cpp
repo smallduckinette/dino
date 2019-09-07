@@ -3,7 +3,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <cassert>
 
-void gltf::detail::parse(const std::string & label,
+void core::detail::parse(const std::string & label,
                          const Json::Value * node,
                          size_t & value)
 {
@@ -15,7 +15,7 @@ void gltf::detail::parse(const std::string & label,
   value = node->asUInt64();
 }
 
-void gltf::detail::parse(const std::string & label,
+void core::detail::parse(const std::string & label,
                          const Json::Value * node,
                          unsigned int & value)
 {
@@ -27,7 +27,7 @@ void gltf::detail::parse(const std::string & label,
   value = node->asUInt();
 }
 
-void gltf::detail::parse(const std::string & label,
+void core::detail::parse(const std::string & label,
                          const Json::Value * node,
                          std::string & value)
 {
@@ -39,7 +39,7 @@ void gltf::detail::parse(const std::string & label,
   value = node->asString();
 }
 
-void gltf::detail::parse(const std::string & label,
+void core::detail::parse(const std::string & label,
                          const Json::Value * node,
                          float & value)
 {
@@ -51,7 +51,7 @@ void gltf::detail::parse(const std::string & label,
   value = node->asDouble(); 
 }
 
-void gltf::detail::parse(const std::string & label,
+void core::detail::parse(const std::string & label,
                          const Json::Value * node,
                          bool & value)
 {
@@ -63,13 +63,13 @@ void gltf::detail::parse(const std::string & label,
   value = node->asBool();   
 }
 
-const Json::Value * gltf::getNode(const Json::Value & document,
+const Json::Value * core::getNode(const Json::Value & document,
                                   const std::string & name)
 {
   return document.find(name.c_str(), name.c_str() + name.size());
 }
 
-const Json::Value & gltf::getNodeOrThrow(const Json::Value & document,
+const Json::Value & core::getNodeOrThrow(const Json::Value & document,
                                          const std::string & name)
 {
   const Json::Value * node = getNode(document, name);
@@ -79,7 +79,7 @@ const Json::Value & gltf::getNodeOrThrow(const Json::Value & document,
     throw std::runtime_error("Cannot find expected node " + name);
 }
 
-void gltf::get(const Json::Value & document,
+void core::get(const Json::Value & document,
                const std::string & name,
                glm::mat4 & value)
 {
@@ -91,7 +91,7 @@ void gltf::get(const Json::Value & document,
   value = glm::make_mat4(&elts[0]);
 }
 
-void gltf::get(const Json::Value & document,
+void core::get(const Json::Value & document,
                const std::string & name,
                glm::quat & value)
 {
@@ -103,7 +103,7 @@ void gltf::get(const Json::Value & document,
   value = glm::make_quat(&elts[0]);
 }
 
-void gltf::get(const Json::Value & document,
+void core::get(const Json::Value & document,
                const std::string & name,
                glm::vec3 & value)
 {
@@ -115,7 +115,7 @@ void gltf::get(const Json::Value & document,
   value = glm::make_vec3(&elts[0]);
 }
 
-void gltf::get(const Json::Value & document,
+void core::get(const Json::Value & document,
                const std::string & name,
                glm::vec4 & value)
 {

@@ -9,7 +9,7 @@
 #undef GLM_ENABLE_EXPERIMENTAL
 
 #include "base64.h"
-#include "json_utils.h"
+#include "core/json_utils.h"
 
 namespace glm
 {
@@ -104,8 +104,8 @@ namespace
 
 gltf::Scene::Scene(const Json::Value & sceneDocument)
 {
-  get(sceneDocument, "name", _name);
-  get(sceneDocument, "nodes", _nodes);
+  core::get(sceneDocument, "name", _name);
+  core::get(sceneDocument, "nodes", _nodes);
 }
 
 gltf::Scene::Scene(const std::optional<std::string> & name,
@@ -137,16 +137,16 @@ std::ostream & gltf::operator<<(std::ostream & str, const Scene & scene)
 
 gltf::Node::Node(const Json::Value & nodeDocument)
 {
-  get(nodeDocument, "camera", _camera);
-  get(nodeDocument, "children", _children);
-  get(nodeDocument, "skin", _skin);
-  get(nodeDocument, "matrix", _matrix);
-  get(nodeDocument, "mesh", _mesh);
-  get(nodeDocument, "rotation", _rotation);
-  get(nodeDocument, "scale", _scale);
-  get(nodeDocument, "translation", _translation);
-  get(nodeDocument, "weights", _weights);
-  get(nodeDocument, "name", _name);
+  core::get(nodeDocument, "camera", _camera);
+  core::get(nodeDocument, "children", _children);
+  core::get(nodeDocument, "skin", _skin);
+  core::get(nodeDocument, "matrix", _matrix);
+  core::get(nodeDocument, "mesh", _mesh);
+  core::get(nodeDocument, "rotation", _rotation);
+  core::get(nodeDocument, "scale", _scale);
+  core::get(nodeDocument, "translation", _translation);
+  core::get(nodeDocument, "weights", _weights);
+  core::get(nodeDocument, "name", _name);
 }
 
 gltf::Node::Node(const std::optional<size_t> & camera,
@@ -210,11 +210,11 @@ std::ostream & gltf::operator<<(std::ostream & str, const Node & node)
 
 gltf::Primitive::Primitive(const Json::Value & primitiveDocument)
 {
-  get(primitiveDocument, "attributes", _attributes);
-  get(primitiveDocument, "indices", _indices);
-  get(primitiveDocument, "material", _material);
-  get(primitiveDocument, "mode", _mode, GLenum(GL_TRIANGLES));
-  get(primitiveDocument, "targets", _targets);
+  core::get(primitiveDocument, "attributes", _attributes);
+  core::get(primitiveDocument, "indices", _indices);
+  core::get(primitiveDocument, "material", _material);
+  core::get(primitiveDocument, "mode", _mode, GLenum(GL_TRIANGLES));
+  core::get(primitiveDocument, "targets", _targets);
 }
 
 gltf::Primitive::Primitive(const std::map<std::string, size_t> & attributes,
@@ -258,7 +258,7 @@ std::ostream & gltf::operator<<(std::ostream & str, const Primitive & primitive)
 
 gltf::Mesh::Mesh(const Json::Value & meshDocument)
 {
-  const Json::Value * primitivesDoc = getNode(meshDocument, "primitives");
+  const Json::Value * primitivesDoc = core::getNode(meshDocument, "primitives");
   if(primitivesDoc)
   {
     for(auto && primitiveDoc : *primitivesDoc)
@@ -266,8 +266,8 @@ gltf::Mesh::Mesh(const Json::Value & meshDocument)
       _primitives.push_back(Primitive(primitiveDoc));
     }
   }  
-  get(meshDocument, "weights", _weights);
-  get(meshDocument, "name", _name);
+  core::get(meshDocument, "weights", _weights);
+  core::get(meshDocument, "name", _name);
 }
 
 gltf::Mesh::Mesh(const std::vector<Primitive> & primitives,
@@ -303,13 +303,13 @@ std::ostream & gltf::operator<<(std::ostream & str, const Mesh & mesh)
 gltf::Buffer::Buffer(const Json::Value & bufferDocument,
                      const std::filesystem::path & modelPath)
 {
-  get(bufferDocument, "name", _name);
+  core::get(bufferDocument, "name", _name);
   
   size_t byteLength;
   std::optional<std::string> uri;
   
-  get(bufferDocument, "byteLength", byteLength);
-  get(bufferDocument, "uri", uri);
+  core::get(bufferDocument, "byteLength", byteLength);
+  core::get(bufferDocument, "uri", uri);
   
   if(!uri)
     _data.resize(byteLength);
@@ -339,12 +339,12 @@ gltf::Buffer::Buffer(const Json::Value & bufferDocument,
 
 gltf::BufferView::BufferView(const Json::Value & bufferViewDocument)
 {
-  get(bufferViewDocument, "buffer", _buffer);
-  get(bufferViewDocument, "byteOffset", _byteOffset, size_t(0));
-  get(bufferViewDocument, "byteLength", _byteLength);
-  get(bufferViewDocument, "byteStride", _byteStride, size_t(0));
-  get(bufferViewDocument, "target", _target);
-  get(bufferViewDocument, "name", _name);
+  core::get(bufferViewDocument, "buffer", _buffer);
+  core::get(bufferViewDocument, "byteOffset", _byteOffset, size_t(0));
+  core::get(bufferViewDocument, "byteLength", _byteLength);
+  core::get(bufferViewDocument, "byteStride", _byteStride, size_t(0));
+  core::get(bufferViewDocument, "target", _target);
+  core::get(bufferViewDocument, "name", _name);
 }
 
 gltf::BufferView::BufferView(size_t buffer,
@@ -391,9 +391,9 @@ std::ostream & gltf::operator<<(std::ostream & str, const BufferView & bufferVie
 ////////////////////
 gltf::Sparse::Sparse(const Json::Value & sparseDocument)
 {
-  get(sparseDocument, "count", _count);
-  get(sparseDocument, "indices", _indices);
-  get(sparseDocument, "values", _values);
+  core::get(sparseDocument, "count", _count);
+  core::get(sparseDocument, "indices", _indices);
+  core::get(sparseDocument, "values", _values);
 }
 
 gltf::Sparse::Sparse(size_t count,
@@ -428,18 +428,18 @@ std::ostream & gltf::operator<<(std::ostream & str, const Sparse & sparse)
 ////////////////////
 gltf::Accessor::Accessor(const Json::Value & accessorDocument)
 {
-  get(accessorDocument, "bufferView", _bufferView);
-  get(accessorDocument, "byteOffset", _byteOffset, size_t(0));
-  get(accessorDocument, "componentType", _componentType);
-  get(accessorDocument, "normalized", _normalized, false);
-  get(accessorDocument, "count", _count);
-  get(accessorDocument, "type", _type);
-  get(accessorDocument, "max", _max);
-  get(accessorDocument, "min", _min);
-  const Json::Value * sparse = getNode(accessorDocument, "sparse");
+  core::get(accessorDocument, "bufferView", _bufferView);
+  core::get(accessorDocument, "byteOffset", _byteOffset, size_t(0));
+  core::get(accessorDocument, "componentType", _componentType);
+  core::get(accessorDocument, "normalized", _normalized, false);
+  core::get(accessorDocument, "count", _count);
+  core::get(accessorDocument, "type", _type);
+  core::get(accessorDocument, "max", _max);
+  core::get(accessorDocument, "min", _min);
+  const Json::Value * sparse = core::getNode(accessorDocument, "sparse");
   if(sparse)
     _sparse = Sparse(sparse);
-  get(accessorDocument, "name", _name);
+  core::get(accessorDocument, "name", _name);
 }
 
 gltf::Accessor::Accessor(const std::optional<size_t> & bufferView,
@@ -523,8 +523,8 @@ std::ostream & gltf::operator<<(std::ostream & str, const Accessor & accessor)
 
 gltf::TextureInfo::TextureInfo(const Json::Value & materialDocument)
 {
-  get(materialDocument, "index", _index);
-  get(materialDocument, "texCoord", _texCoord, size_t(0));
+  core::get(materialDocument, "index", _index);
+  core::get(materialDocument, "texCoord", _texCoord, size_t(0));
 }
 
 gltf::TextureInfo::TextureInfo(size_t index,
@@ -556,9 +556,9 @@ std::ostream & gltf::operator<<(std::ostream & str, const TextureInfo & textureI
 
 gltf::NormalTextureInfo::NormalTextureInfo(const Json::Value & materialDocument)
 {
-  get(materialDocument, "index", _index);
-  get(materialDocument, "texCoord", _texCoord, size_t(0));
-  get(materialDocument, "scale", _scale, 1.0f);
+  core::get(materialDocument, "index", _index);
+  core::get(materialDocument, "texCoord", _texCoord, size_t(0));
+  core::get(materialDocument, "scale", _scale, 1.0f);
 }
 
 gltf::NormalTextureInfo::NormalTextureInfo(size_t index,
@@ -593,9 +593,9 @@ std::ostream & gltf::operator<<(std::ostream & str, const NormalTextureInfo & te
 
 gltf::OcclusionTextureInfo::OcclusionTextureInfo(const Json::Value & materialDocument)
 {
-  get(materialDocument, "index", _index);
-  get(materialDocument, "texCoord", _texCoord, size_t(0));
-  get(materialDocument, "strength", _strength, 1.0f);
+  core::get(materialDocument, "index", _index);
+  core::get(materialDocument, "texCoord", _texCoord, size_t(0));
+  core::get(materialDocument, "strength", _strength, 1.0f);
 }
 
 gltf::OcclusionTextureInfo::OcclusionTextureInfo(size_t index,
@@ -630,15 +630,15 @@ std::ostream & gltf::operator<<(std::ostream & str, const OcclusionTextureInfo &
 
 gltf::PbrMetallicRoughness::PbrMetallicRoughness(const Json::Value & pbrDocument)
 {
-  get(pbrDocument, "baseColorFactor", _baseColorFactor, glm::vec4(1, 1, 1, 1));
-  const Json::Value * baseColorTexture = getNode(pbrDocument, "baseColorTexture");
+  core::get(pbrDocument, "baseColorFactor", _baseColorFactor, glm::vec4(1, 1, 1, 1));
+  const Json::Value * baseColorTexture = core::getNode(pbrDocument, "baseColorTexture");
   if(baseColorTexture)
   {
     _baseColorTexture = TextureInfo(*baseColorTexture);
   }
-  get(pbrDocument, "metallicFactor", _metallicFactor, 1.0f);
-  get(pbrDocument, "roughnessFactor", _roughnessFactor, 1.0f);
-  const Json::Value * metallicRoughnessTexture = getNode(pbrDocument, "metallicRoughnessTexture");
+  core::get(pbrDocument, "metallicFactor", _metallicFactor, 1.0f);
+  core::get(pbrDocument, "roughnessFactor", _roughnessFactor, 1.0f);
+  const Json::Value * metallicRoughnessTexture = core::getNode(pbrDocument, "metallicRoughnessTexture");
   if(metallicRoughnessTexture)
   {
     _metallicRoughnessTexture = TextureInfo(*metallicRoughnessTexture);
@@ -686,31 +686,31 @@ std::ostream & gltf::operator<<(std::ostream & str, const PbrMetallicRoughness &
 
 gltf::Material::Material(const Json::Value & materialDocument)
 {
-  get(materialDocument, "name", _name);
-  const Json::Value * pbr = getNode(materialDocument, "pbrMetallicRoughness");
+  core::get(materialDocument, "name", _name);
+  const Json::Value * pbr = core::getNode(materialDocument, "pbrMetallicRoughness");
   if(pbr)
   {
     _pbrMetallicRoughness = PbrMetallicRoughness(*pbr);
   }
-  const Json::Value * normal = getNode(materialDocument, "normalTexture");
+  const Json::Value * normal = core::getNode(materialDocument, "normalTexture");
   if(normal)
   {
     _normalTexture = NormalTextureInfo(*normal);
   }
-  const Json::Value * occlusion = getNode(materialDocument, "occlusionTexture");
+  const Json::Value * occlusion = core::getNode(materialDocument, "occlusionTexture");
   if(occlusion)
   {
     _occlusionTexture = OcclusionTextureInfo(*occlusion);
   }  
-  const Json::Value * emissive = getNode(materialDocument, "emissiveTexture");
+  const Json::Value * emissive = core::getNode(materialDocument, "emissiveTexture");
   if(emissive)
   {
     _emissiveTexture = TextureInfo(*emissive);
   }
-  get(materialDocument, "emissiveFactor", _emissiveFactor, glm::vec3(0, 0, 0));
-  get(materialDocument, "alphaMode", _alphaMode, std::string("OPAQUE"));
-  get(materialDocument, "alphaCutoff", _alphaCutoff, 0.5f);
-  get(materialDocument, "doubleSided", _doubleSided, false);
+  core::get(materialDocument, "emissiveFactor", _emissiveFactor, glm::vec3(0, 0, 0));
+  core::get(materialDocument, "alphaMode", _alphaMode, std::string("OPAQUE"));
+  core::get(materialDocument, "alphaCutoff", _alphaCutoff, 0.5f);
+  core::get(materialDocument, "doubleSided", _doubleSided, false);
 }
 
 gltf::Material::Material(const std::optional<std::string> & name,
@@ -770,9 +770,9 @@ std::ostream & gltf::operator<<(std::ostream & str, const Material & material)
 
 gltf::Texture::Texture(const Json::Value & textureDocument)
 {
-  get(textureDocument, "sampler", _sampler);
-  get(textureDocument, "source", _source);
-  get(textureDocument, "name", _name);
+  core::get(textureDocument, "sampler", _sampler);
+  core::get(textureDocument, "source", _source);
+  core::get(textureDocument, "name", _name);
 }
 
 gltf::Texture::Texture(const std::optional<size_t> & sampler,
@@ -808,11 +808,11 @@ std::ostream & gltf::operator<<(std::ostream & str, const Texture & texture)
 
 gltf::Sampler::Sampler(const Json::Value & samplerDocument)
 {
-  get(samplerDocument, "magFilter", _magFilter);
-  get(samplerDocument, "minFilter", _minFilter);
-  get(samplerDocument, "wrapS", _wrapS, GLenum(GL_REPEAT));
-  get(samplerDocument, "wrapT", _wrapT, GLenum(GL_REPEAT));
-  get(samplerDocument, "name", _name);
+  core::get(samplerDocument, "magFilter", _magFilter);
+  core::get(samplerDocument, "minFilter", _minFilter);
+  core::get(samplerDocument, "wrapS", _wrapS, GLenum(GL_REPEAT));
+  core::get(samplerDocument, "wrapT", _wrapT, GLenum(GL_REPEAT));
+  core::get(samplerDocument, "name", _name);
 }
 
 gltf::Sampler::Sampler(const std::optional<GLenum> & magFilter,
@@ -857,10 +857,10 @@ std::ostream & gltf::operator<<(std::ostream & str, const Sampler & sampler)
 
 gltf::Image::Image(const Json::Value & imageDocument)
 {
-  get(imageDocument, "uri", _uri);
-  get(imageDocument, "mimeType", _mimeType);
-  get(imageDocument, "bufferView", _bufferView);
-  get(imageDocument, "name", _name);
+  core::get(imageDocument, "uri", _uri);
+  core::get(imageDocument, "mimeType", _mimeType);
+  core::get(imageDocument, "bufferView", _bufferView);
+  core::get(imageDocument, "name", _name);
 }
 
 gltf::Image::Image(const std::optional<std::string> & uri,
@@ -900,8 +900,8 @@ std::ostream & gltf::operator<<(std::ostream & str, const Image & image)
 
 gltf::Target::Target(const Json::Value & targetDocument)
 {
-  get(targetDocument, "node", _node);
-  get(targetDocument, "path", _path);
+  core::get(targetDocument, "node", _node);
+  core::get(targetDocument, "path", _path);
 }
 
 gltf::Target::Target(const std::optional<size_t> & node,
@@ -932,9 +932,9 @@ std::ostream & gltf::operator<<(std::ostream & str, const Target & target)
 ////////////////////
 
 gltf::Channel::Channel(const Json::Value & channelDocument):
-  _target(getNodeOrThrow(channelDocument, "target"))
+  _target(core::getNodeOrThrow(channelDocument, "target"))
 {
-  get(channelDocument, "sampler", _sampler);
+  core::get(channelDocument, "sampler", _sampler);
 }
 
 gltf::Channel::Channel(size_t sampler,
@@ -966,9 +966,9 @@ std::ostream & gltf::operator<<(std::ostream & str, const Channel & channel)
 
 gltf::AnimationSampler::AnimationSampler(const Json::Value & samplerDocument)
 {
-  get(samplerDocument, "input", _input);
-  get(samplerDocument, "interpolation", _interpolation);
-  get(samplerDocument, "output", _output);
+  core::get(samplerDocument, "input", _input);
+  core::get(samplerDocument, "interpolation", _interpolation);
+  core::get(samplerDocument, "output", _output);
 }
 
 gltf::AnimationSampler::AnimationSampler(size_t input,
@@ -1004,7 +1004,7 @@ std::ostream & gltf::operator<<(std::ostream & str, const AnimationSampler & sam
 
 gltf::Animation::Animation(const Json::Value & animationDocument)
 {
-  const Json::Value * channelsDoc = getNode(animationDocument, "channels");
+  const Json::Value * channelsDoc = core::getNode(animationDocument, "channels");
   if(channelsDoc)
   {
     for(auto && channelDoc : *channelsDoc)
@@ -1012,7 +1012,7 @@ gltf::Animation::Animation(const Json::Value & animationDocument)
       _channels.push_back(Channel(channelDoc));
     }
   }
-  const Json::Value * samplersDoc = getNode(animationDocument, "samplers");
+  const Json::Value * samplersDoc = core::getNode(animationDocument, "samplers");
   if(samplersDoc)
   {
     for(auto && samplerDoc : *samplersDoc)
@@ -1020,7 +1020,7 @@ gltf::Animation::Animation(const Json::Value & animationDocument)
       _samplers.push_back(AnimationSampler(samplerDoc));
     }
   }    
-  get(animationDocument, "name", _name);
+  core::get(animationDocument, "name", _name);
 }
 
 gltf::Animation::Animation(const std::vector<Channel> & channels,
@@ -1062,10 +1062,10 @@ gltf::Asset::Asset(const std::string & gltfFile)
   str >> document;
   
   // Scene
-  get(document, "scene", _scene);
+  core::get(document, "scene", _scene);
   
   // Scenes
-  const Json::Value * scenesDoc = getNode(document, "scenes");
+  const Json::Value * scenesDoc = core::getNode(document, "scenes");
   if(scenesDoc)
   {
     for(auto && sceneDoc : *scenesDoc)
@@ -1075,7 +1075,7 @@ gltf::Asset::Asset(const std::string & gltfFile)
   }
 
   // Nodes
-  const Json::Value * nodesDoc = getNode(document, "nodes");
+  const Json::Value * nodesDoc = core::getNode(document, "nodes");
   if(nodesDoc)
   {
     for(auto && nodeDoc : *nodesDoc)
@@ -1085,7 +1085,7 @@ gltf::Asset::Asset(const std::string & gltfFile)
   }
 
   // Meshes
-  const Json::Value * meshesDoc = getNode(document, "meshes");
+  const Json::Value * meshesDoc = core::getNode(document, "meshes");
   if(meshesDoc)
   {
     for(auto && meshDoc : *meshesDoc)
@@ -1095,7 +1095,7 @@ gltf::Asset::Asset(const std::string & gltfFile)
   }
 
   // Buffers
-  const Json::Value * buffersDoc = getNode(document, "buffers");
+  const Json::Value * buffersDoc = core::getNode(document, "buffers");
   if(buffersDoc)
   {
     for(auto && bufferDoc : *buffersDoc)
@@ -1105,7 +1105,7 @@ gltf::Asset::Asset(const std::string & gltfFile)
   }
   
   // BufferViews
-  const Json::Value * bufferViewsDoc = getNode(document, "bufferViews");
+  const Json::Value * bufferViewsDoc = core::getNode(document, "bufferViews");
   if(bufferViewsDoc)
   {
     for(auto && bufferViewDoc : *bufferViewsDoc)
@@ -1115,7 +1115,7 @@ gltf::Asset::Asset(const std::string & gltfFile)
   }
 
   // Accessors
-  const Json::Value * accessorsDoc = getNode(document, "accessors");
+  const Json::Value * accessorsDoc = core::getNode(document, "accessors");
   if(accessorsDoc)
   {
     for(auto && accessorDoc : *accessorsDoc)
@@ -1125,7 +1125,7 @@ gltf::Asset::Asset(const std::string & gltfFile)
   }
   
   // Materials
-  const Json::Value * materialsDoc = getNode(document, "materials");
+  const Json::Value * materialsDoc = core::getNode(document, "materials");
   if(materialsDoc)
   {
     for(auto && materialDoc : *materialsDoc)
@@ -1135,7 +1135,7 @@ gltf::Asset::Asset(const std::string & gltfFile)
   }  
   
   // Textures
-  const Json::Value * texturesDoc = getNode(document, "textures");
+  const Json::Value * texturesDoc = core::getNode(document, "textures");
   if(texturesDoc)
   {
     for(auto && textureDoc : *texturesDoc)
@@ -1145,7 +1145,7 @@ gltf::Asset::Asset(const std::string & gltfFile)
   }  
 
   // Samplers
-  const Json::Value * samplersDoc = getNode(document, "samplers");
+  const Json::Value * samplersDoc = core::getNode(document, "samplers");
   if(samplersDoc)
   {
     for(auto && samplerDoc : *samplersDoc)
@@ -1155,7 +1155,7 @@ gltf::Asset::Asset(const std::string & gltfFile)
   }  
 
   // Images
-  const Json::Value * imagesDoc = getNode(document, "images");
+  const Json::Value * imagesDoc = core::getNode(document, "images");
   if(imagesDoc)
   {
     for(auto && imageDoc : *imagesDoc)
@@ -1165,7 +1165,7 @@ gltf::Asset::Asset(const std::string & gltfFile)
   }
 
   // Animations
-  const Json::Value * animationsDoc = getNode(document, "animations");
+  const Json::Value * animationsDoc = core::getNode(document, "animations");
   if(animationsDoc)
   {
     for(auto && animationDoc : *animationsDoc)

@@ -1,0 +1,9 @@
+{
+    "shape":
+    {
+        "type" : "sphere",
+        "radius" : 5
+    },
+    "mass" : 1.0,
+    "restitution" : 0.9
+}

@@ -10,9 +10,11 @@ class PhysicSystem
 {
 public:
   PhysicSystem();
+  PhysicSystem(const PhysicSystem &) = delete;
+  PhysicSystem & operator=(const PhysicSystem &) = delete;
   
   void add(EntityId entityId);
-  
+
 private:
   btDefaultCollisionConfiguration _configuration;
   btCollisionDispatcher _dispatcher;
