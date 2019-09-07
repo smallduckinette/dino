@@ -5,7 +5,7 @@
 #include <SDL2/SDL.h>
 #include <glm/glm.hpp>
 
-#include "signal.h"
+#include "entity/signal.h"
 
 class Controller
 {
