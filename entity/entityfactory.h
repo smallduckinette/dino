@@ -11,12 +11,15 @@ class System;
 class EntityFactory
 {
 public:
+  EntityFactory(const std::string & entityDefinition);
+  
   void registerSystem(const std::string & name,
                       System * system);
   
-  EntityId addEntity(const Json::Value & doc);
+  EntityId addEntity(const std::string & entity);
   
 private:
+  Json::Value _doc;
   EntityIdGenerator _entityIdGenerator;
   std::map<std::string, System *> _systems;
 };

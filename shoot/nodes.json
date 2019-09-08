@@ -1,0 +1,19 @@
+{
+    "ball" : 
+    {
+        "physics" :
+        {
+            "shape":
+            {
+                "type" : "sphere",
+                "radius" : 1
+            },
+            "mass" : 1.0,
+            "restitution" : 0.9
+        },
+        "graphics" :
+        {
+            "model" : "ball.gltf"
+        }
+    }
+}
