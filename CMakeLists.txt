@@ -20,6 +20,7 @@ pkg_check_modules(SDL2IMAGE SDL2_image)
 include_directories(${Boost_INCLUDE_DIRS})
 
 add_subdirectory(core)
+add_subdirectory(entity)
 add_subdirectory(adh)
 add_subdirectory(gltf)
 add_subdirectory(tests)

@@ -1,5 +1,6 @@
 #include "physicsystem.h"
 
+#include "body.h"
 
 PhysicSystem::PhysicSystem():
   _dispatcher(&_configuration),
@@ -10,6 +11,11 @@ PhysicSystem::PhysicSystem():
 {
 }
 
-void PhysicSystem::add(EntityId)
+void PhysicSystem::add(EntityId entityId, const Json::Value & doc)
 {
+  _bodies.insert({entityId, std::make_shared<Body>(doc,
+                                                   btVector3(0, 0, 0),
+                                                   btVector3(0, 0, 0),
+                                                   &_world)});
 }
+

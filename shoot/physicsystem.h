@@ -1,19 +1,22 @@
 #ifndef __SHOOT_PHYSICSYSTEM_H__
 #define __SHOOT_PHYSICSYSTEM_H__
 
-#include "entity/entityid.h"
-
+#include <memory>
 #include <btBulletCollisionCommon.h>
 #include <btBulletDynamicsCommon.h>
 
-class PhysicSystem
+#include "entity/system.h"
+
+class Body;
+
+class PhysicSystem : public System
 {
 public:
   PhysicSystem();
   PhysicSystem(const PhysicSystem &) = delete;
   PhysicSystem & operator=(const PhysicSystem &) = delete;
   
-  void add(EntityId entityId);
+  void add(EntityId entityId, const Json::Value & doc) override;
 
 private:
   btDefaultCollisionConfiguration _configuration;
@@ -21,6 +24,8 @@ private:
   btDbvtBroadphase _overlappingPairCache;
   btSequentialImpulseConstraintSolver _solver;
   btDiscreteDynamicsWorld _world;
+  
+  std::map<EntityId, std::shared_ptr<Body> > _bodies;
 };
 
 #endif
