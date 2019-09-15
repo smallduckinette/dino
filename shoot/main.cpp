@@ -5,6 +5,10 @@
 #include "graphicsystem.h"
 #include "physicsystem.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
+#undef GLM_ENABLE_EXPERIMENTAL
+
 namespace po = boost::program_options;
 
 int main(int argc, char ** argv)
@@ -34,15 +38,30 @@ int main(int argc, char ** argv)
     GraphicSystem graphicSystem(shaderDir);
     PhysicSystem physicSystem;
     
+    physicSystem.onMove().connect(std::bind(&GraphicSystem::move,
+                                            std::ref(graphicSystem),
+                                            std::placeholders::_1,
+                                            std::placeholders::_2));
+
+    //physicSystem.onMove().connect
+    //  ([](EntityId entityId, const glm::mat4 & matrix)
+    //   {
+    //     std::cout << entityId << " " << glm::to_string(matrix) << std::endl;
+    //   });
+    
     EntityFactory entityFactory(nodesFile);
     entityFactory.registerSystem("graphics", &graphicSystem);
     entityFactory.registerSystem("physics", &physicSystem);
     
     entityFactory.addEntity("ball");
     
+    auto floor = entityFactory.addEntity("floor");
+    physicSystem.move(floor, glm::vec3(0, -5, 0));    
+    
     bool running = true;
     while(running)
     {
+      auto t1 = std::chrono::steady_clock::now();
       SDL_Event event;
       while(SDL_PollEvent(&event))
       {
@@ -53,6 +72,9 @@ int main(int argc, char ** argv)
       }
       
       graphicSystem.display();
+      auto t2 = std::chrono::steady_clock::now();
+      std::chrono::duration<float> d = (t2 - t1);
+      physicSystem.run(d.count());
     }
   }
   catch(const std::exception & e)

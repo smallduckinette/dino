@@ -15,5 +15,18 @@
         {
             "model" : "ball/ball.gltf"
         }
+    },
+    "floor" : 
+    {
+        "physics" :
+        {
+            "shape":
+            {
+                "type" : "box",
+                "dimensions" : [2, 2, 2]
+            },
+            "mass" : 0,
+            "restitution" : 0.9
+        }
     }
 }

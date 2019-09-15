@@ -18,6 +18,8 @@ public:
   void init(const std::filesystem::path & rootDirectory) override;
   void add(EntityId entityId, const Json::Value & doc) override;
   
+  void move(EntityId entityId, const glm::mat4 & matrix);
+  
 private:
   std::filesystem::path _shaderDirectory;
   std::filesystem::path _modelDirectory;

@@ -1,5 +1,6 @@
 #include "body.h"
 
+#include <glm/gtc/type_ptr.hpp>
 #include "core/json_utils.h"
 
 Body::Body(const Json::Value & doc,
@@ -24,11 +25,13 @@ Body::~Body()
   _world->removeRigidBody(&_body);
 }
 
-btTransform Body::getWorldTransform() const
+glm::mat4 Body::getWorldTransform() const
 {
   btTransform trans;
   _motionState.getWorldTransform(trans);
-  return trans;
+  float rawMatrix[16];
+  trans.getOpenGLMatrix(rawMatrix);
+  return glm::make_mat4(rawMatrix);
 }
 
 std::unique_ptr<btCollisionShape> Body::makeShape(const Json::Value & doc) const
@@ -79,4 +82,13 @@ float Body::getRestitution(const Json::Value & doc) const
   float restitution = 0;
   core::get(doc, "restitution", restitution, 0.f);
   return restitution;
+}
+
+void Body::move(const glm::vec3 & position)
+{
+  btTransform transform;
+  transform.setIdentity();
+  transform.setOrigin(btVector3(position.x, position.y, position.z));
+  _motionState.setWorldTransform(transform);
+  _body.setWorldTransform(transform);
 }

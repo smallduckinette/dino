@@ -82,3 +82,12 @@ void GraphicSystem::add(EntityId entityId, const Json::Value & doc)
   
   _entities.insert({entityId, transform});
 }
+
+void GraphicSystem::move(EntityId entityId, const glm::mat4 & matrix)
+{
+  auto it = _entities.find(entityId);
+  if(it != _entities.end())
+  {
+    it->second->setMatrix(matrix);
+  }
+}

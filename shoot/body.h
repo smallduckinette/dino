@@ -5,6 +5,7 @@
 #include <btBulletCollisionCommon.h>
 #include <btBulletDynamicsCommon.h>
 #include <json/json.h>
+#include <glm/glm.hpp>
 
 class Body
 {
@@ -15,7 +16,9 @@ public:
        btDiscreteDynamicsWorld * world);
   ~Body();
   
-  btTransform getWorldTransform() const;
+  glm::mat4 getWorldTransform() const;
+
+  void move(const glm::vec3 & position);
   
 private:
   std::unique_ptr<btCollisionShape> makeShape(const Json::Value & doc) const;
