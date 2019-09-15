@@ -1,6 +1,7 @@
 #include "graphicsystem.h"
 
 #include <GL/glew.h>
+#include <glm/gtc/matrix_transform.hpp>
 #include "core/json_utils.h"
 #include "adh/animation.h"
 #include "gltf/builder.h"
@@ -40,6 +41,9 @@ GraphicSystem::GraphicSystem(const std::filesystem::path & shaderDirectory):
                                           (float)SCR_WIDTH / (float)SCR_HEIGHT,
                                           0.1f,
                                           100.0f);
+  _camera->setViewMatrix(glm::lookAt(glm::vec3(0, 0, -10),
+                                     glm::vec3(0, 0, -9),
+                                     glm::vec3(0, 1, 0)));
 }
 
 GraphicSystem::~GraphicSystem()
@@ -74,6 +78,7 @@ void GraphicSystem::add(EntityId entityId, const Json::Value & doc)
   
   auto transform = std::make_shared<adh::Transform>();
   transform->addChild(builder.build(animations));
+  _camera->addChild(transform);
   
   _entities.insert({entityId, transform});
 }
