@@ -1054,9 +1054,12 @@ std::ostream & gltf::operator<<(std::ostream & str, const Animation & animation)
 // Asset
 ////////////////////
 
-gltf::Asset::Asset(const std::string & gltfFile)
+gltf::Asset::Asset(const std::filesystem::path & gltfFile)
 {
-  std::filesystem::path modelPath = std::filesystem::path(gltfFile).parent_path();
+  if(!std::filesystem::exists(gltfFile))
+    throw std::runtime_error("Cannot find file " + std::string(gltfFile));
+  
+  std::filesystem::path modelPath = gltfFile.parent_path();
   std::ifstream str(gltfFile);
   Json::Value document;
   str >> document;

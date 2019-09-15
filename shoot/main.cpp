@@ -12,14 +12,14 @@ int main(int argc, char ** argv)
   try
   {
     std::string shaderDir;
-    std::string dataDir;
+    std::string nodesFile;
     
     po::options_description desc("Options");
     desc.add_options()
       ("help", "Displays help")
       ("verbose,v", "Verbose logging")
       ("shaders", po::value<std::string>(&shaderDir)->default_value("."), "Shader directory")
-      ("data", po::value<std::string>(&dataDir)->default_value("."), "Data directory");
+      ("nodes", po::value<std::string>(&nodesFile)->default_value("nodes.json"), "Nodes file");
     
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -34,7 +34,7 @@ int main(int argc, char ** argv)
     GraphicSystem graphicSystem(shaderDir);
     PhysicSystem physicSystem;
     
-    EntityFactory entityFactory(dataDir + "/nodes.json");
+    EntityFactory entityFactory(nodesFile);
     entityFactory.registerSystem("graphics", &graphicSystem);
     entityFactory.registerSystem("physics", &physicSystem);
     

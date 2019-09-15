@@ -27,8 +27,8 @@ namespace gltf
   {
   public:
     Builder(const std::shared_ptr<adh::Clock> & clock,
-            const std::string & shaderPath,
-            const std::string & gltfFile);
+            const std::filesystem::path & shaderPath,
+            const std::filesystem::path & gltfFile);
     
     std::unique_ptr<adh::Node> build(std::vector<std::unique_ptr<adh::Animation> > & animations) const;
     

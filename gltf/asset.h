@@ -406,7 +406,7 @@ namespace gltf
   class Asset
   {
   public:
-    Asset(const std::string & gltfFile);
+    Asset(const std::filesystem::path & gltfFile);
     
     size_t _scene;
     std::vector<Scene> _scenes;

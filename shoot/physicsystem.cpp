@@ -11,6 +11,10 @@ PhysicSystem::PhysicSystem():
 {
 }
 
+void PhysicSystem::init(const std::filesystem::path &)
+{
+}
+
 void PhysicSystem::add(EntityId entityId, const Json::Value & doc)
 {
   _bodies.insert({entityId, std::make_shared<Body>(doc,

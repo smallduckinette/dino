@@ -15,7 +15,8 @@ public:
   PhysicSystem();
   PhysicSystem(const PhysicSystem &) = delete;
   PhysicSystem & operator=(const PhysicSystem &) = delete;
-  
+
+  void init(const std::filesystem::path &) override;
   void add(EntityId entityId, const Json::Value & doc) override;
 
 private:

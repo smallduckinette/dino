@@ -10,15 +10,17 @@
 class GraphicSystem : public System
 {
 public:
-  GraphicSystem(const std::string & shaderDirectory);
+  GraphicSystem(const std::filesystem::path & shaderDirectory);
   ~GraphicSystem();
   
   void display();
-  
+
+  void init(const std::filesystem::path & rootDirectory) override;
   void add(EntityId entityId, const Json::Value & doc) override;
   
 private:
-  std::string _shaderDirectory;
+  std::filesystem::path _shaderDirectory;
+  std::filesystem::path _modelDirectory;
   SDL_Window * _window;
   SDL_GLContext _glContext;
   

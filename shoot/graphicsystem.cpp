@@ -5,7 +5,7 @@
 #include "adh/animation.h"
 #include "gltf/builder.h"
 
-GraphicSystem::GraphicSystem(const std::string & shaderDirectory):
+GraphicSystem::GraphicSystem(const std::filesystem::path & shaderDirectory):
   _shaderDirectory(shaderDirectory)
 {
   if(SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -59,12 +59,17 @@ void GraphicSystem::display()
   SDL_GL_SwapWindow(_window);  
 }
 
+void GraphicSystem::init(const std::filesystem::path & rootDirectory)
+{
+  _modelDirectory = rootDirectory;
+}
+
 void GraphicSystem::add(EntityId entityId, const Json::Value & doc)
 {
   std::string model;
   core::get(doc, "model", model);
   
-  gltf::Builder builder(nullptr, _shaderDirectory, model);
+  gltf::Builder builder(nullptr, _shaderDirectory, _modelDirectory / model);
   std::vector<std::unique_ptr<adh::Animation> > animations;
   
   auto transform = std::make_shared<adh::Transform>();

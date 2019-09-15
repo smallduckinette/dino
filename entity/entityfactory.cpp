@@ -5,14 +5,21 @@
 #include "core/json_utils.h"
 #include "system.h"
 
-EntityFactory::EntityFactory(const std::string & entityDefinition)
+EntityFactory::EntityFactory(const std::string & entityFile)
 {
-  std::ifstream str(entityDefinition);
+  std::filesystem::path file(entityFile);
+  if(!std::filesystem::exists(file))
+    throw std::runtime_error("Cannot find entity file " + entityFile);
+  
+  _rootDirectory = file.parent_path();
+  
+  std::ifstream str(entityFile);
   str >> _doc;
 }
 
 void EntityFactory::registerSystem(const std::string & name, System * system)
 {
+  system->init(_rootDirectory);
   _systems.insert({name, system});
 }
 

@@ -13,7 +13,7 @@
         },
         "graphics" :
         {
-            "model" : "ball.gltf"
+            "model" : "ball/ball.gltf"
         }
     }
 }

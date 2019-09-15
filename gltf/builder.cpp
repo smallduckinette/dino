@@ -18,12 +18,12 @@
 
 
 gltf::Builder::Builder(const std::shared_ptr<adh::Clock> & clock,
-                       const std::string & shaderPath,
-                       const std::string & gltfFile):
+                       const std::filesystem::path & shaderPath,
+                       const std::filesystem::path & gltfFile):
   _clock(clock),
-  _shaderPath(std::filesystem::path(shaderPath)),
+  _shaderPath(shaderPath),
   _asset(std::make_shared<Asset>(gltfFile)),
-  _modelPath(std::filesystem::path(gltfFile).parent_path())
+  _modelPath(gltfFile.parent_path())
 {
 }
 
