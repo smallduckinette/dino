@@ -13,7 +13,7 @@
         },
         "graphics" :
         {
-            "model" : "ball/ball.gltf"
+            "model" : "ball2/ball2.gltf"
         }
     },
     "floor" : 
@@ -23,10 +23,14 @@
             "shape":
             {
                 "type" : "box",
-                "dimensions" : [2, 2, 2]
+                "dimensions" : [6, 1, 4]
             },
             "mass" : 0,
             "restitution" : 0.9
+        },
+        "graphics" :
+        {
+            "model" : "temple/temple.gltf"
         }
     }
 }

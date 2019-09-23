@@ -42,12 +42,6 @@ int main(int argc, char ** argv)
                                             std::ref(graphicSystem),
                                             std::placeholders::_1,
                                             std::placeholders::_2));
-
-    //physicSystem.onMove().connect
-    //  ([](EntityId entityId, const glm::mat4 & matrix)
-    //   {
-    //     std::cout << entityId << " " << glm::to_string(matrix) << std::endl;
-    //   });
     
     EntityFactory entityFactory(nodesFile);
     entityFactory.registerSystem("graphics", &graphicSystem);

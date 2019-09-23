@@ -41,8 +41,8 @@ GraphicSystem::GraphicSystem(const std::filesystem::path & shaderDirectory):
                                           (float)SCR_WIDTH / (float)SCR_HEIGHT,
                                           0.1f,
                                           100.0f);
-  _camera->setViewMatrix(glm::lookAt(glm::vec3(0, 0, -10),
-                                     glm::vec3(0, 0, -9),
+  _camera->setViewMatrix(glm::lookAt(glm::vec3(0, -3, -7),
+                                     glm::vec3(0, -3, -6),
                                      glm::vec3(0, 1, 0)));
 }
 
@@ -58,6 +58,7 @@ void GraphicSystem::display()
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   
   adh::Context context;
+  context._lightPosition = glm::vec3(5, 5, -5);
   _camera->draw(context);
   
   SDL_GL_SwapWindow(_window);  

@@ -17,6 +17,10 @@ Body::Body(const Json::Value & doc,
 {
   _body.setRestitution(getRestitution(doc));
   _body.setLinearVelocity(velocity);
+  if(getMass(doc) > 0)
+  {
+    _body.setAngularVelocity(btVector3(4, 1, 2));
+  }
   _world->addRigidBody(&_body);
 }
 
